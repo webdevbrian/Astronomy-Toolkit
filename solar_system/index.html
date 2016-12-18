@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<htm>
+  <head>
+    <title>Solar System</title>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+  </head>
+  <body>
+    <script src = "../lib/three.js/three.min.js"></script>
+<!--    <script src = "../lib/three.js/OrbitControls.js"></script>-->
+    <script src = "../lib/three.js/TrackballControls.js"></script>
+
+    <script type="application/x-glsl" id="sky-vertex">
+      varying vec2 vUV;
+      void main() {
+        vUV = uv;
+        vec4 pos = vec4(position, 1.0);
+        gl_Position = projectionMatrix * modelViewMatrix * pos;
+      }
+    </script>
+
+    <script type="application/x-glsl" id="sky-fragment">
+      uniform sampler2D texture;
+      varying vec2 vUV;
+
+      void main() {
+        vec4 sample = texture2D(texture, vUV);
+        gl_FragColor = vec4(sample.xyz, sample.w);
+      }
+    </script>
+
+    <script src = "celestial_body.js"></script>
+    <script src = "planetRepresentation.js"></script>
+    <script src = "solarSystem.js"></script>
+
+    <div id = "info">
+      <p>FPS: <span id="fps">00</span>fps</p>
+      <p>Date: <span id="date"></span></p>
+      <p>Time Warp: <span id="warp"></span>x</p>
+
+    </div>
+  </body>
+</htm>

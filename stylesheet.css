@@ -1,0 +1,153 @@
+body{
+  background-color: #ecf0f1;
+  /*background-image: url("./res/starry_night.jpg");
+  background-size:cover;
+  background-attachment: fixed;
+  background-position: center;
+*/
+  color: #FFF;
+  margin: 0px;
+  font-family: Arial, Helvetica, sans-serif	;
+  min-height: 100%;
+}
+
+/*Main CSS from top to bottom*/
+
+#title{
+  position: relative;
+  display: table;
+  background-color: #c0392b;
+  top: 0px;
+  width: 100%;
+  margin: 0px;
+  height: 80px;
+  text-align: center;
+  border-style: solid;
+  border-color: #212121;
+  border-width: 0px 0px 2px 0px;
+
+}
+ #title h1{
+   display: inline-block;
+   position: relative;
+   vertical-align: middle;
+   font-size: 40px;
+ }
+
+ #title h2{
+   position: relative;
+   display: inline-block;
+   left: 20%;
+   margin-right: 30px;
+   font-size: 80%;
+ }
+
+
+#pages_container{
+  position: relative;
+  left: 15% ;
+  top: 30px;
+  width: 70%;
+  height: 100%;
+}
+
+.page{
+  float: left;
+  position: relative;
+  top: 0px;
+  left: 0px;
+
+  width: calc(21.7vw - 10px); /*container_width * 31% - border_width * 2 * ellements/line*/
+  height: calc(21.7vw - 10px);
+  margin-left: 1%;
+  margin-top: 20px;
+  padding: 0px;
+
+  text-align: center;
+  border-radius: 50%;
+  border:5px solid gray;
+  overflow: hidden;
+
+  -webkit-filter: grayscale(100%);
+  -moz-filter: grayscale(100%);
+  -o-filter: grayscale(100%);
+  filter: grayscale(100%);
+
+
+
+  -webkit-transition: 200ms;
+  -moz-transition: 200ms;
+  -o-transition: 200ms;
+  transition: 200ms;
+
+  background-size: cover !important;
+}
+
+
+.page h3{
+
+  vertical-align: middle;
+  z-index: 0;
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  top: 100%;
+  left: 0%;
+
+  padding-top: 2.5%;
+  width: 100%;
+  height: 50%;
+  color: white;
+  vertical-align: middle;
+
+  -webkit-transition: 200ms;
+  -moz-transition: 200ms;
+  -o-transition: 200ms;
+  transition: 200ms;
+
+  font-weight: 500;
+  font-size: 2.5vh;
+}
+
+#bottom_bar{
+  display: table;
+  clear: left;
+  position: relative;
+  text-align: center;
+  background-color: #212121;
+  width: 100%;
+  height: 2em;
+  font-size: 15px;
+  font-weight: normal;
+  left: 0px;
+  top: 40px;
+}
+
+#bottom_bar p{
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 16px;
+}
+
+/*Animations*/
+.page:hover h3{
+  background-color: rgba(33, 33, 33, 0.7);
+  transform: translate(0,-58%);
+}
+
+.page:hover{
+  border-color: #212121;
+  -webkit-filter: grayscale(0%);
+  -moz-filter: grayscale(0%);
+  -o-filter: grayscale(0%);
+  filter: grayscale(0%);
+
+}
+
+/*Media Queries*/
+@media screen and (max-width: 1280px) {
+    .page{
+      width: calc(33.6vw - 10px);
+      height: calc(33.6vw - 10px);
+    }
+}
