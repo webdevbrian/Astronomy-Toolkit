@@ -34,12 +34,12 @@ a{
     transform: rotate(90deg);
     left:238px;
     top:50px;
-      
+
 }
 
 #showAbout{
     position: absolute;
-    
+
     -webkit-transform: rotate(270deg);
     -moz-transform: rotate(270deg);
     -ms-transform: rotate(270deg);
@@ -48,8 +48,8 @@ a{
     width:300px;
     left:-170px;
     top:50%;
-    margin-top: -18px; 
-      
+    margin-top: -18px;
+
 }
 
 #showButtonDate{
@@ -71,7 +71,7 @@ a{
   -moz-transform:translate(0px,88px);
   -ms-transform:translate(0px,88px);
   -o-transform:translate(0px,88px);
-  transform:translate(0px,88px); 
+  transform:translate(0px,88px);
 }
 
 .moveAbout{
@@ -79,7 +79,7 @@ a{
   -moz-transform:translate(-300px,0px);
   -ms-transform:translate(-300px,0px);
   -o-transform:translate(-300px,0px);
-  transform:translate(-100%,0px); 
+  transform:translate(-100%,0px);
 }
 
 .textInputs input[type="text"]::selection {
@@ -109,10 +109,10 @@ a{
     background-color:rgba(100, 100, 100, 0.075);
     border-radius: 5px 5px 0px 0px;
     padding: 0px 0px 0px 15px;
-    
+
 }
 
-.textInputs input[type="text"], textarea, select { 
+.textInputs input[type="text"], textarea, select {
     outline: none;
 }
 
@@ -128,7 +128,7 @@ a{
     background-repeat: no-repeat;
     display: inline-block;
     background-color:rgba(100, 100, 100, 0);
-    border-style: none; 
+    border-style: none;
     width: 35px;
     height: 25px;
     margin-left: 10px;
@@ -143,13 +143,13 @@ a{
     transition: ease-in-out, width .35s ease-in-out;
     float: left;
     display: inline-block;
-    background-color: white; 
+    background-color: white;
     background-image: url(./up.png);
     background-size : 70% 40%;
     background-repeat: no-repeat;
     background-position: left top;
     background-color:rgba(100, 100, 100, 0);
-    border-style: none; 
+    border-style: none;
     width: 35px;
     height: 25px;
     margin-left: 10px;
@@ -163,7 +163,7 @@ a{
     top: -18px;
     left: -7px;
     margin-left: 0px;
-    
+
 }
 
 #downArrows{
@@ -200,7 +200,7 @@ a{
     outline:0px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 .textInputs label{
@@ -243,12 +243,12 @@ a{
     position: relative;
     width: 290px;
     top:30px;
-    padding-left: 5px; 
+    padding-left: 5px;
     left: -5px;
 }
 
 #settings{
-    -webkit-user-select: none; /* Chrome/Safari */        
+    -webkit-user-select: none; /* Chrome/Safari */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+ */
     position: fixed;
@@ -261,7 +261,7 @@ a{
     border-left: none;
     margin:0px;
     padding: 5px;
-    border-radius: 0px 5px 5px 0px; 
+    border-radius: 0px 5px 5px 0px;
     color:white;
     background-color:rgba(100, 100, 100, 0.075);
     box-shadow: 0px 0px 0px #000;
@@ -281,9 +281,9 @@ a{
     margin: 5px 20px 5px 20px;
     padding-top: 5px;
     padding-right: 5px;
-    padding-left: 5px; 
+    padding-left: 5px;
     padding-bottom: 5px;
-    margin-left: -115px; 
+    margin-left: -115px;
     background-color:rgba(80, 80, 80, 0.15);
     border-style: solid;
     border-width: 2px;
@@ -291,7 +291,7 @@ a{
 }
 
 .subSettings:hover{
-    
+
     background-color:rgba(90, 90, 90, 0.35);
     box-shadow: 0px 0px 4px #000;
 }
@@ -340,7 +340,7 @@ input[type="checkbox"], input[type="radio"] {
   margin: 15px 20px -25px 50px;
   padding-left: 45px;
   padding-top: -9px;
-    
+
 
   cursor: pointer;
   color:#fff;
@@ -364,7 +364,7 @@ input[type="radio"] + .side-label::after {
   display: block;
   width: 16px;
   height: 16px;
-  border: 2px solid #C0C0C0;  
+  border: 2px solid #C0C0C0;
 }
 
 input:focus + .side-label::before {
@@ -430,7 +430,7 @@ input:checked + .side-label::after {
 
 #close:hover, #close:active{
     background-color: rgba(100, 100, 100, 0.3);
-    
+
 }
 
 #starmap{

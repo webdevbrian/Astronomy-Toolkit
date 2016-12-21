@@ -59,6 +59,8 @@ var orbits = [];
 var skyboxMesh;
 var planetSprite = THREE.ImageUtils.loadTexture("./res/planet.png");
 
+var canvasWidth, canvasHeight;
+
 window.onload = function(){
   init();
   createSkybox();
@@ -163,7 +165,7 @@ function addSpritesToScene(){
 
 function updateScales(){
   for(bodySprite of celestialBodySprites){
-    bodySprite.updateScale(camera);
+    bodySprite.updateScale(camera, canvasWidth, canvasHeight);
   }
 }
 
@@ -269,10 +271,20 @@ window.onkeydown = function (e) {
 
 
 window.onresize = function(e){
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+  canvasWidth = getBrowserWidth();
+  canvasHeight = getBrowserHeight();
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(canvasWidth, canvasHeight);
+  camera.aspect = canvasWidth / canvasHeight;
+  camera.updateProjectionMatrix();
+}
+
+function getBrowserWidth(){
+  return Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+}
+
+function getBrowserHeight(){
+  return Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 }
 
 function addNumberedBodies(file){
@@ -358,12 +370,16 @@ function getParameters(name) {
 
 function init(){
   scene = new THREE.Scene();
-  aspect_ratio = window.innerWidth / window.innerHeight;
+
+  canvasWidth = getBrowserWidth();
+  canvasHeight = getBrowserHeight();
+  aspect_ratio = canvasWidth / canvasHeight;
   camera = new THREE.PerspectiveCamera(75, aspect_ratio, 0.0000000001, 10000);
   camera.lookAt(new THREE.Vector3(0,0,0));
   renderer = new THREE.WebGLRenderer({antialias:true});
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  renderer.setSize(canvasWidth, canvasHeight);
   scene.background = new THREE.Color(0x111111);
 
   renderer.domElement.style="position:absolute; top:0px; left:0px; margin:0px; "
