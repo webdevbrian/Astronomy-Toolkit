@@ -77,8 +77,8 @@ window.onload = function(){
   addOrbitsToScene();
   addSpritesToScene();
 
-  addSmallBodies('./res/uaie.txt');
-//  addSmallBodies('./res/ELEMENTS.NUMBR');
+  addNumberedBodies('./res/numberedBodies.dat');
+  addUnumberedBodies('./res/unnumberedBodies.dat');
 
   var axes = new THREE.Object3D();
   length = 1;
@@ -220,6 +220,10 @@ function deg2rad(angle){
   return angle * Math.PI / 180.00;
 }
 
+function rad2deg(angle){
+  return angle * 180 / Math.PI;
+}
+
 function getDistance(p1, p2){
   return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) + (p1.z - p2.z) * (p1.z - p2.z));
 }
@@ -271,8 +275,7 @@ window.onresize = function(e){
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function addSmallBodies(file){
-//  var data =  $.ajax({url: file, async: false}).responseText;
+function addNumberedBodies(file){
   $.get(file, function(data){
     var lines = data.split("\n");
 
@@ -281,7 +284,7 @@ function addSmallBodies(file){
 
       if(id > 0){
         var name = line.substring(6, 25).replace(" ", "");
-        var epochUaie = parseInt(line.substring(25, 32));
+        var epochEphem = parseInt(line.substring(25, 32));
         var semiMajorAxis = parseFloat(line.substring(32, 42));
         var eccentricty = parseFloat(line.substring(42, 54));
         var inclination = deg2rad(parseFloat(line.substring(54, 62)));
@@ -292,14 +295,8 @@ function addSmallBodies(file){
         var longitudeOfPericenter = argOfPericenter + longitudeOfNode;
 
         meanAngularMotion = 2.0 * Math.PI / Math.sqrt(semiMajorAxis * semiMajorAxis * semiMajorAxis);
-        meanAnomaly2000 = meanAnomalyAtEpoch - meanAngularMotion * (epochUaie - MJD_AT_J2000) / 365.25;
+        meanAnomaly2000 = meanAnomalyAtEpoch - meanAngularMotion * (epochEphem - MJD_AT_J2000) / 365.25;
         while(meanAnomaly2000 < 0) meanAnomaly2000 += 2 * Math.PI;
-  //      meanAnomaly2000 = meanAnomaly2000 - 2 * Math.PI * parseInt(meanAnomaly2000 / (Math.PI * 2)) + Math.PI * 2;
-
-        console.log(meanAngularMotion * 180 / Math.PI + " " + (epochUaie - MJD_AT_J2000) / 365.25);
-
-
-        console.log(semiMajorAxis + " " + eccentricty  + " " + rad2deg(inclination) + " " + rad2deg(argOfPericenter) + " " + rad2deg(longitudeOfNode) + " " + 180 * meanAnomalyAtEpoch / Math.PI);
 
         var asteroid = new CelestialBody(name, semiMajorAxis, eccentricty, inclination, longitudeOfNode, longitudeOfPericenter, meanAnomaly2000);
         var asteroidSprite = new CelestialBodySprite(asteroid, planetSprite, 10);
@@ -308,15 +305,46 @@ function addSmallBodies(file){
     //    scene.add(asteroidSprite.label);
         scene.add(asteroidSprite.sprite);
 
-      //  console.log(id);
       }
     }
   });
 }
 
-function rad2deg(angle){
-  return angle * 180 / Math.PI;
+function addUnumberedBodies(file){
+  $.get(file, function(data){
+    var lines = data.split("\n");
+
+    for(line of lines){
+      var firstChar = line.charAt(0);
+
+      if(firstChar != " " && firstChar != "-" && firstChar != "D"){
+        var name = line.substring(0, 11).replace(" ", "");
+        var epochEphem = parseInt(line.substring(12, 17));
+        var semiMajorAxis = parseFloat(line.substring(18, 29));
+        var eccentricty = parseFloat(line.substring(30, 40));
+        var inclination = deg2rad(parseFloat(line.substring(41, 50)));
+        var argOfPericenter = deg2rad(parseFloat(line.substring(51, 60)));
+        var longitudeOfNode = deg2rad(parseFloat(line.substring(61, 70)));
+        var meanAnomalyAtEpoch = deg2rad(parseFloat(line.substring(71, 82)));
+
+        var longitudeOfPericenter = argOfPericenter + longitudeOfNode;
+
+        meanAngularMotion = 2.0 * Math.PI / Math.sqrt(semiMajorAxis * semiMajorAxis * semiMajorAxis);
+        meanAnomaly2000 = meanAnomalyAtEpoch - meanAngularMotion * (epochEphem - MJD_AT_J2000) / 365.25;
+        while(meanAnomaly2000 < 0) meanAnomaly2000 += 2 * Math.PI;
+
+        var asteroid = new CelestialBody(name, semiMajorAxis, eccentricty, inclination, longitudeOfNode, longitudeOfPericenter, meanAnomaly2000);
+        var asteroidSprite = new CelestialBodySprite(asteroid, planetSprite, 10);
+        planets.push(asteroid);
+        celestialBodySprites.push(asteroidSprite);
+    //    scene.add(asteroidSprite.label);
+        scene.add(asteroidSprite.sprite);
+
+      }
+    }
+  });
 }
+
 
 //TODO remove this
 function getParameters(name) {
@@ -347,6 +375,6 @@ function init(){
   controls.zoomSpeed = 0.12;
   controls.rotateCamera();
   controls.minDistance = 0.1;
-  controls.maxDistance = 60;
+  controls.maxDistance = 90;
   controls.dynamicDampingFactor = 0.3;
 }
