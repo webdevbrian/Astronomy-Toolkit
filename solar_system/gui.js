@@ -7,7 +7,6 @@ function loadGUI(){
   datGUI = new dat.GUI({autoplace: false});
   var container = document.getElementById("guiContainer");
   container.appendChild(datGUI.domElement);
-  datGUI.domElement.style.zIndex = 999999;
 
   datGUI.add(this, 'timeWarp', -100000000, +100000000).name("Time Warp").listen();
   pauseButton = datGUI.add(this, 'tooglePause').name("Pause").listen();

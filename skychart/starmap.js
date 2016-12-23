@@ -38,8 +38,8 @@ function setSize(){
     var testHeight = getBrowserHeight() * 0.978;
     var size = Math.min(testWidth, testHeight);
     if(size > 895 && size < 1030){
-    	canv.width = testWidth;
-        canv.height = testHeight;
+    	canv.width = size;
+        canv.height = size;
     }
     else{
     	canv.width=900 ;
