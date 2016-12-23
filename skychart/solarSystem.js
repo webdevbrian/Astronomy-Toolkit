@@ -296,9 +296,10 @@ function Spheric2Rect(spheric, d){
     rect.z = d*Math.sin(spheric.lat);
     return rect;
 }
-
+/*
 function setSize(){
-    var testWidth = getBrowserWidth() * 0.978;
+    var oldSize = Math.min(canv.width, canv.height);
+	var testWidth = getBrowserWidth() * 0.978;
     var testHeight = getBrowserHeight() * 0.978;
     var size = Math.min(testWidth, testHeight);
     if(size > 895 && size < 1030){
@@ -306,15 +307,20 @@ function setSize(){
         canv.height = size;
    }
     else{
-        canv.width=900;
-        canv.height=900;
+        canv.width=900 ;
+        canv.height=900 ;
     }
-
+	
     height = canv.height;
     width = canv.width;
-    document.getElementById("starmap").style.marginLeft = -width/2+"px";
+	ctx.scale(width / oldSize, height / oldHeight);	
+	//document.style.width = canv.width;
+	//canv.style.height = canv.height;
+    document.getElementById("starmap").style.marginLeft = -height/2+"px";
+//	ctx = canv.getContext("2d");
+//	drawStuff();	
 }
-
+*/
 function getBrowserWidth(){
   return Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 }

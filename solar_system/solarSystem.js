@@ -1,8 +1,10 @@
 var lastTime = Date.now();
+var center = {x: 0, y: 0, z: 0};
 var deltaT = 0;
 var fps;
 var paused = false;
 var timeWarp = 1000000;
+var followedObjectId = -1; //-1 is the center;
 
 var scene, aspect_ratio, camera, renderer, controls;
 
@@ -12,6 +14,9 @@ var MJD_AT_J2000 = 51544;
 
 var epoch = unixToEpoch(Date.now() / 1000.0);
 
+var showObjectsCloseToSun = true;
+var maxDistanceOfCamera = 40; //from this distance the objects close to the sun dissapear
+var maxDistanceOfObject = 5;  //objects from this distance dissapear
 
 var showOrbits = true;
 
@@ -22,31 +27,32 @@ var planets = [
   new CelestialBody("Venus",        0.7230, 0.006773, deg2rad(3.3947), deg2rad(76.679900), deg2rad(131.53298), deg2rad(50.4160980)),
   new CelestialBody("Earth",        1.0000, 0.016700, deg2rad(0.0000), deg2rad(-11.26064), deg2rad(102.94719), deg2rad(357.529109)),
   new CelestialBody("Mars",         1.5240, 0.093405, deg2rad(1.8510), deg2rad(49.557400), deg2rad(336.04084), deg2rad(19.3727660)),
-  new CelestialBody("Juno",         2.6700, 0.254981, deg2rad(12.982), deg2rad(169.91138), deg2rad(58.204242), deg2rad(240.155636)),
-  new CelestialBody("Ceres",        2.7653, 0.079138, deg2rad(10.586), deg2rad(80.393200), deg2rad(151.84910), deg2rad(6.06964272)),
-  new CelestialBody("Pallas",       2.7721, 0.230999, deg2rad(34.840), deg2rad(173.12950), deg2rad(123.46330), deg2rad(352.853564)),
-  new CelestialBody("67P",          3.4648, 0.641436, deg2rad(7.0458), deg2rad(50.084660), deg2rad(62.926768), deg2rad(216.153893)),
+//  new CelestialBody("Juno",         2.6700, 0.254981, deg2rad(12.982), deg2rad(169.91138), deg2rad(58.204242), deg2rad(240.155636)),
+//  new CelestialBody("Ceres",        2.7653, 0.079138, deg2rad(10.586), deg2rad(80.393200), deg2rad(151.84910), deg2rad(6.06964272)),
+//  new CelestialBody("Pallas",       2.7721, 0.230999, deg2rad(34.840), deg2rad(173.12950), deg2rad(123.46330), deg2rad(352.853564)),
+//  new CelestialBody("67P",          3.4648, 0.641436, deg2rad(7.0458), deg2rad(50.084660), deg2rad(62.926768), deg2rad(216.153893)),
   new CelestialBody("Jupiter",      5.2030, 0.048498, deg2rad(1.3050), deg2rad(100.45420), deg2rad(14.753850), deg2rad(20.0203120)),
   new CelestialBody("Saturn",       9.5230, 0.055546, deg2rad(2.4840), deg2rad(113.66340), deg2rad(92.431940), deg2rad(317.020207)),
-  new CelestialBody("1P/Halley",    17.834, 0.967142, deg2rad(162.26), deg2rad(58.420080), deg2rad(169.75256), deg2rad(65.8423700)),
+//  new CelestialBody("1P/Halley",    17.834, 0.967142, deg2rad(162.26), deg2rad(58.420080), deg2rad(169.75256), deg2rad(65.8423700)),
   new CelestialBody("Uranus",       19.208, 0.047318, deg2rad(0.7700), deg2rad(74.000500), deg2rad(170.96424), deg2rad(141.049714)),
   new CelestialBody("Neptune",      30.087, 0.008606, deg2rad(1.7690), deg2rad(131.78060), deg2rad(44.971350), deg2rad(256.228389)),
   new CelestialBody("Pluto",        39.746, 0.250000, deg2rad(17.142), deg2rad(110.30340), deg2rad(224.43738), deg2rad(14.0921741)),
-//  new CelestialBody("Uaie",         50.746, 0.999999, deg2rad(0.0000), deg2rad(0.0000000), deg2rad(180.00000), deg2rad(0.00000000), deg2rad(119.610)),
 ];
+
+var followablePlanets = planets;
 
 var colors = [
   0xa6e97d,  //Mercury
   0xf6f57b,  //Venus
   0x42A5F5,  //Earth
   0xfa7f95,  //Mars
-  0x423232,  //Juno
-  0xdbca72,  //Ceres
-  0x49506e,   //Pallas
-  0x488e72,   //67P
+//  0x423232,  //Juno
+//  0xdbca72,  //Ceres
+//  0x49506e,   //Pallas
+//  0x488e72,   //67P
   0x9bf5ea,  //Jupiter
   0xf9d27e,  //Saturn
-  0x599858,  //1P
+//  0x599858,  //1P
   0x8e7bec,  //Uranus
   0xa34949,  //Neptune
   0x74b16d,  //Pluto
@@ -62,6 +68,7 @@ var planetSprite = THREE.ImageUtils.loadTexture("./res/planet.png");
 var canvasWidth, canvasHeight;
 
 window.onload = function(){
+  loadGUI();
   init();
   createSkybox();
   createOrbits();
@@ -125,6 +132,7 @@ function render(){
   fps++;
   updateScales();
   updateSkybox();
+  checkForOverlap();
 
   var now = new Date().getTime();
   var sinceLastFrame = now - lastTime;
@@ -134,9 +142,8 @@ function render(){
     updatePositionAndRotation();
 
   }
-
+  updateCamera();
   document.getElementById('date').innerHTML=unixToString(epochToUnixTime(epoch));
-  requestAnimationFrame(render);
   controls.update();
 
   deltaT += sinceLastFrame;
@@ -148,24 +155,65 @@ function render(){
   }
 
   renderer.render(scene, camera);
+  requestAnimationFrame(render);
+
+}
+
+function checkForOverlap(){
+  var dist = getDistance(center, camera.position);
+	if(dist > maxDistanceOfCamera && showObjectsCloseToSun){
+    disableObjectsCloseToSun();
+    showObjectsCloseToSun = false;
+  }
+  if(dist < maxDistanceOfCamera && !showObjectsCloseToSun){
+    enableObjectsCloseToSun();
+    showObjectsCloseToSun = true;
+  }
+}
+
+function disableObjectsCloseToSun(){
+  for(sprite of celestialBodySprites){
+    if(sprite.planet.semiMajorAxis < maxDistanceOfObject){
+      scene.remove(scene.getObjectById(sprite.symbol.id));
+      scene.remove(scene.getObjectById(sprite.label.id));
+    }
+  }
+
+}
+
+function enableObjectsCloseToSun(){
+  for(sprite of celestialBodySprites){
+    if(sprite.planet.semiMajorAxis < maxDistanceOfObject){
+      sprite.addTo(scene);
+    }
+  }
 }
 
 function createSprites(){
   for(planet of planets){
-    celestialBodySprites.push(new CelestialBodySprite(planet, planetSprite, 20));
+    celestialBodySprites.push(new CelestialBodySprite(planet, planetSprite, 20, true));
   }
 }
 
 function addSpritesToScene(){
   for(bodySprite of celestialBodySprites){
-    scene.add(bodySprite.sprite);
-    scene.add(bodySprite.label);
+    bodySprite.addTo(scene);
   }
 }
 
 function updateScales(){
   for(bodySprite of celestialBodySprites){
     bodySprite.updateScale(camera, canvasWidth, canvasHeight);
+  }
+}
+
+function updateCamera(){
+  if(followedObjectId == -1){
+    controls.target.set(0, 0, 0)
+  }
+  else{
+    var position = celestialBodySprites[followedObjectId].symbol.position;
+    controls.target.set(position.x, position.y, position.z)
   }
 }
 
@@ -246,15 +294,13 @@ window.onkeydown = function (e) {
     var code = e.keyCode ? e.keyCode : e.which;
     //alert(code);
     if (code === 32) { //SPACE key
-      paused = !paused;
+      tooglePause();
     }
     else if(code === 39){ //RIGHT ARROW
       timeWarp *= 2;
-      document.getElementById('warp').innerHTML = Math.floor(timeWarp);
     }
     else if(code === 37){  //LEFT ARROW
       timeWarp /= 2;
-      document.getElementById('warp').innerHTML = Math.floor(timeWarp);
     }
 
     else if(code === 79){
@@ -315,7 +361,7 @@ function addNumberedBodies(file){
         planets.push(asteroid);
         celestialBodySprites.push(asteroidSprite);
     //    scene.add(asteroidSprite.label);
-        scene.add(asteroidSprite.sprite);
+        scene.add(asteroidSprite.symbol);
 
       }
     }
@@ -346,11 +392,11 @@ function addUnumberedBodies(file){
         while(meanAnomaly2000 < 0) meanAnomaly2000 += 2 * Math.PI;
 
         var asteroid = new CelestialBody(name, semiMajorAxis, eccentricty, inclination, longitudeOfNode, longitudeOfPericenter, meanAnomaly2000);
-        var asteroidSprite = new CelestialBodySprite(asteroid, planetSprite, 10);
+        var asteroidSprite = new CelestialBodySprite(asteroid, planetSprite, 10, false);
         planets.push(asteroid);
         celestialBodySprites.push(asteroidSprite);
     //    scene.add(asteroidSprite.label);
-        scene.add(asteroidSprite.sprite);
+        asteroidSprite.addTo(scene);
 
       }
     }

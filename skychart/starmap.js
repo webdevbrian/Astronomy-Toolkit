@@ -7,7 +7,10 @@ offSet.y=0;
 zoom=1;
 unixTime = Date.now();
 var canv = document.getElementById("starmap");
+console.log(canv.height + " " + canv.width);
+//setSize();
 var ctx = canv.getContext("2d");
+//ctx.imageSmoothingEnabled = false;
 var lat = deg2rad(51.48);
 var longitude = deg2rad(0);
 setSize();
@@ -28,6 +31,32 @@ window.onresize=function() {
 	setSize();
 	drawStuff();
 }
+
+function setSize(){
+	var oldSize = Math.min(canv.width, canv.height);
+    var testWidth = getBrowserWidth() * 0.978;
+    var testHeight = getBrowserHeight() * 0.978;
+    var size = Math.min(testWidth, testHeight);
+    if(size > 895 && size < 1030){
+    	canv.width = testWidth;
+        canv.height = testHeight;
+    }
+    else{
+    	canv.width=900 ;
+        canv.height=900 ;
+    }
+
+    height = canv.height;
+    width = canv.width;
+
+
+    //document.style.width = canv.width;
+    //canv.style.height = canv.height;
+    document.getElementById("starmap").style.marginLeft = -width/2+"px";
+//  ctx = canv.getContext("2d");
+//  drawStuff();
+}
+
 
 var dataline="";
 
@@ -84,7 +113,7 @@ function drawStuff(){
 		logPos=false;
 	}
 	ctx.restore();
-	ctx.font = "18px Arial";
+	ctx.font = "17px Arial";
 	if(isPrintFr) ctx.fillStyle = "black";
 	else ctx.fillStyle='white';
 	ctx.fillText(date(), 14, 27);

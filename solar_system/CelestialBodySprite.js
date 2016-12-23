@@ -1,25 +1,34 @@
 var labelCanvasSize = 256;
 
-function CelestialBodySprite(planet, texture, spriteSize){
+function CelestialBodySprite(planet, texture, spriteSize, showLabel){
   this.planet = planet;
   this.texture = texture;
   this.spriteSize = spriteSize
-  this.sprite = this.createSprite();
+  this.symbol = this.createSprite();
+  this.showLabel = showLabel;
   this.label = this.createLabelSprite();
   this.segmentCountPerAU = 30;
 }
 
+CelestialBodySprite.prototype.addTo = function(scene){
+  scene.add(this.symbol);
+  if(this.showLabel){
+    scene.add(this.label);
+  }
+}
+
 CelestialBodySprite.prototype.updatePosition  = function(epoch){
   var position = this.planet.getPositionAtEpoch(epoch);
-  this.sprite.position.set(position.x, position.y, position.z);
+  this.symbol.position.set(position.x, position.y, position.z);
   this.label.position.set(position.x, position.y, position.z);
 }
 
 CelestialBodySprite.prototype.updateScale  = function(camera, width, height){
-  var scale =  2 * Math.tan( camera.fov * Math.PI / 360.0 ) * getDistance(this.sprite.position, camera.position) / Math.min(width, height);
+
+  var scale =  2 * Math.tan( camera.fov * Math.PI / 360.0 ) * getDistance(this.symbol.position, camera.position) / 18000 * 20;
   var circleScale = this.spriteSize * scale;
   var labelScale = labelCanvasSize * scale;
-  this.sprite.scale.set(circleScale, circleScale, 0);
+  this.symbol.scale.set(circleScale, circleScale, 0);
   this.label.scale.set(labelScale, labelScale, 0);
 }
 
@@ -49,7 +58,7 @@ CelestialBodySprite.prototype.createLabelSprite  = function(){
   texture.needsUpdate = true;
 
   var material = new THREE.SpriteMaterial({map :texture, transparent:true});
-  var sprite = new THREE.Sprite(material);
-  sprite.scale.set(1, 1, 1);
-  return sprite;
+  var symbol = new THREE.Sprite(material);
+  symbol.scale.set(1, 1, 1);
+  return symbol;
 }
