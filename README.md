@@ -1,5 +1,8 @@
 # Astronomy Toolkit
-## Atestat Informatica
+
+![Skychart Photo](http://i.imgur.com/JPqbVw6.png)
+
+![Solar System Photo](http://i.imgur.com/p0vaf6H.png)
 
 ### Features
 * JavaScript skychart
