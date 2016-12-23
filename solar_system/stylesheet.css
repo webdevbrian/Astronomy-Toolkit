@@ -17,3 +17,11 @@ body{
   color: #fff;
   margin-top: -10px;
 }
+
+#guiContainer{
+  position: absolute;
+  right: 5px;
+  top: 0px;
+  z-index: 99999;
+  user-select: none;
+}

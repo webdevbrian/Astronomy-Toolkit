@@ -48,7 +48,7 @@ var logPos = false;
     ctx.font = "17px Arial";
     ctx.fillText(phaseName, height-141, 25);
     ctx.fillText("Age: "+Math.floor(moonAge*100)/100+" days", height-134, 69);
-    
+
 }*/
 
 function normalise(angle){
@@ -58,7 +58,7 @@ function normalise(angle){
 
 function moonPos(){
 //   JD = 2448724.5;
-    
+
     var T = (JD-2451545)/36525;
     e = deg2rad(23.4392916666666667-0.0130041666666667*T-0.0000001666666667*T*T+0.0000005027777778*T*T*T);
     var L1 = normalisedeg(218.3164477 + 481267.88123421*T - 0.0015786*T*T + Math.pow(T, 3)/538841 - Math.pow(T, 4)/65194000);
@@ -209,7 +209,7 @@ function jupiterPos(){
     helio.y = calcCoord(jupiter.Y, T);
     helio.z = calcCoord(jupiter.Z, T);
     eqCoord(helio, e, name, mag);
-    
+
 }
 
 function uranusPos(){
@@ -278,7 +278,7 @@ function eqCoord(coord, epsilon, n, mag){
     if(isPrintFr) ctx.fillStyle = "black";
     else ctx.fillStyle='#FF8400';
     ctx.fillText(n, planet.x+size+1.5, planet.y+size+1.5);
-    if(logPos) console.log(n+"   "+decHours(eqCoord.ra)+"   "+decDeg(eqCoord.de)); 
+    if(logPos) console.log(n+"   "+decHours(eqCoord.ra)+"   "+decDeg(eqCoord.de));
 }
 
 function calcCoord(c, tau){
@@ -296,20 +296,37 @@ function Spheric2Rect(spheric, d){
     rect.z = d*Math.sin(spheric.lat);
     return rect;
 }
-
+/*
 function setSize(){
-    if(self.innerHeight*0.978 > 895 && self.innerHeight*0.978 < 1030){
-        canv.width=self.innerHeight*0.978;
-        canv.height=self.innerHeight*0.978;
+    var oldSize = Math.min(canv.width, canv.height);
+	var testWidth = getBrowserWidth() * 0.978;
+    var testHeight = getBrowserHeight() * 0.978;
+    var size = Math.min(testWidth, testHeight);
+    if(size > 895 && size < 1030){
+        canv.width = size;
+        canv.height = size;
    }
     else{
-        canv.width=900;
-        canv.height=900; 
+        canv.width=900 ;
+        canv.height=900 ;
     }
-    
+	
     height = canv.height;
     width = canv.width;
+	ctx.scale(width / oldSize, height / oldHeight);	
+	//document.style.width = canv.width;
+	//canv.style.height = canv.height;
     document.getElementById("starmap").style.marginLeft = -height/2+"px";
+//	ctx = canv.getContext("2d");
+//	drawStuff();	
+}
+*/
+function getBrowserWidth(){
+  return Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+}
+
+function getBrowserHeight(){
+  return Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 }
 
 function decHours(angle) {
@@ -329,6 +346,5 @@ function decDeg(angle) {
     if(angle<0 && h>=0) var str = "-"+h+"d "+m+"m "+s+"s";
         else var str = h+"d "+m+"m "+s+"s";
     return str;
-    
-}
 
+}
