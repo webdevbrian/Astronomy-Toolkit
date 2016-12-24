@@ -1,6 +1,6 @@
 var labelCanvasSize = 256;
 
-function CelestialBodySprite(planet, texture, spriteSize, showLabel){
+function CelestialBodySprite(planet, texture, spriteSize, showLabel, flag){
   this.planet = planet;
   this.texture = texture;
   this.spriteSize = spriteSize
@@ -8,6 +8,9 @@ function CelestialBodySprite(planet, texture, spriteSize, showLabel){
   this.showLabel = showLabel;
   this.label = this.createLabelSprite();
   this.segmentCountPerAU = 30;
+  this.shouldDisplay = true;
+  this.display = true;
+  this.flag = flag;
 }
 
 CelestialBodySprite.prototype.addTo = function(scene){
@@ -15,6 +18,13 @@ CelestialBodySprite.prototype.addTo = function(scene){
   if(this.showLabel){
     scene.add(this.label);
   }
+  this.display = true;
+}
+
+CelestialBodySprite.prototype.removeFrom = function(scene){
+  scene.remove(scene.getObjectById(this.symbol.id));
+  scene.remove(scene.getObjectById(this.label.id));
+  this.display = false;
 }
 
 CelestialBodySprite.prototype.updatePosition  = function(epoch){
@@ -34,7 +44,7 @@ CelestialBodySprite.prototype.updateScale  = function(camera, width, height){
 
 
 CelestialBodySprite.prototype.createSprite  = function(){
-  var material = new THREE.SpriteMaterial( { map: this.texture, transparent:true, useScreenCoordinates: false, color: 0xffffff } );
+  var material = new THREE.SpriteMaterial( { map: this.texture, transparent:true, color: 0xffffff } );
 	var sprite = new THREE.Sprite(material);
 	sprite.scale.set(0.2, 0.2, 0.2);
   return sprite;
