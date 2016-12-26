@@ -21,6 +21,7 @@ function loadGUI(){
   var container = document.getElementById("guiContainer");
   container.appendChild(datGUI.domElement);
 
+  datGUI.add(this, 'showHelp').name("Help")
   datGUI.add(this, 'centuriesPerSecond', -0.1, +0.1).name("Speed").step(0.00001).listen();
   pauseButton = datGUI.add(this, 'tooglePause').name("Pause").listen();
   datGUI.add(this, 'showAsteroids').name("Show Belts").onChange(toogleAsteroidBelts);
@@ -41,6 +42,22 @@ function toogleAsteroidBelts(){
   else{
     disableAsteroidBelts();
   }
+}
+
+function showHelp(){
+  var aboutDiv = document.getElementById('about');
+  var bellowDiv = document.getElementById('bellowAbout');
+
+  aboutDiv.classList.add('showAbout');
+  bellowDiv.classList.add('blurBellow');
+}
+
+function closeHelp(){
+  var aboutDiv = document.getElementById('about');
+  var bellowDiv = document.getElementById('bellowAbout');
+
+  aboutDiv.classList.remove('showAbout');
+  bellowDiv.classList.remove('blurBellow');
 }
 
 function toogleSkybox(){

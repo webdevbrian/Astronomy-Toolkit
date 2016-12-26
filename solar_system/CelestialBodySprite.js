@@ -35,7 +35,7 @@ CelestialBodySprite.prototype.updatePosition  = function(epoch){
 
 CelestialBodySprite.prototype.updateScale  = function(camera, width, height){
 
-  var scale =  2 * Math.tan( camera.fov * Math.PI / 360.0 ) * getDistance(this.symbol.position, camera.position) / 18000 * 20;
+  var scale =  2 * Math.tan( camera.fov * Math.PI / 360.0 ) * getDistance(this.symbol.position, camera.position) / 18000 * 18;
   var circleScale = this.spriteSize * scale;
   var labelScale = labelCanvasSize * scale;
   this.symbol.scale.set(circleScale, circleScale, 0);
