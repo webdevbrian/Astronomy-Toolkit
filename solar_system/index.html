@@ -27,7 +27,6 @@
         <p>Date: <span id="date"></span></p>
       </div>
 
-      <a href = "#" onclick = "addAbout();" id = "aboutLink">InfoPoint</a>
     </div>
 
     <div id = "about">
@@ -67,25 +66,8 @@
         <li><a href="https://github.com/jquery/jquery">JQuery</a></li>
       </ul>
 
-      <a href = "#" onclick = "closeAbout();" id = "aboutClose">Close</a>
+      <a  href = "javascript:void(0)" onclick = "closeHelp();" id = "aboutClose">Close</a>
     </div>
-
-    <script>
-      var aboutDiv = document.getElementById('about');
-      var bellowDiv = document.getElementById('bellowAbout');
-
-      function addAbout(){
-        aboutDiv.classList.add('showAbout');
-        bellowDiv.classList.add('blurBellow');
-        paused = true;
-      }
-
-      function closeAbout(){
-        aboutDiv.classList.remove('showAbout');
-        bellowDiv.classList.remove('blurBellow');
-        paused = false;
-      }
-    </script>
 
   </body>
 </htm>
