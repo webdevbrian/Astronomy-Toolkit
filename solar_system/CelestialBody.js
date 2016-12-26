@@ -10,6 +10,7 @@ function CelestialBody(name, semiMajorAxis, eccentricty, inclination, longitudeO
   this.argOfPericenter = longitudeOfPericenter - longitudeOfNode;
 }
 
+
 CelestialBody.prototype.getPositionAtEpoch = function(epoch){
   var meanAnomalyNow = this.getMeanAnomalyNow(epoch);
   var eccentricAnomaly = this.getEccentricAnomaly(meanAnomalyNow);
