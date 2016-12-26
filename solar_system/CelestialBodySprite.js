@@ -44,7 +44,7 @@ CelestialBodySprite.prototype.updateScale  = function(camera, width, height){
 
 
 CelestialBodySprite.prototype.createSprite  = function(){
-  var material = new THREE.SpriteMaterial( { map: this.texture, transparent:true, color: 0xffffff } );
+  var material = new THREE.SpriteMaterial( { map: this.texture, transparent:true, color:0xffffff} );
 	var sprite = new THREE.Sprite(material);
 	sprite.scale.set(0.2, 0.2, 0.2);
   return sprite;
@@ -66,9 +66,12 @@ CelestialBodySprite.prototype.createLabelSprite  = function(){
   var texture = new THREE.Texture(canvas);
   texture.minFilter = THREE.LinearFilter;
   texture.needsUpdate = true;
+//  texture.magFilter = THREE.NearestFilter;
+//  texture.minFilter = THREE.LinearMipMapLinearFilter;
+
 
   var material = new THREE.SpriteMaterial({map :texture, transparent:true});
-  var symbol = new THREE.Sprite(material);
-  symbol.scale.set(1, 1, 1);
-  return symbol;
+  var label = new THREE.Sprite(material);
+  label.scale.set(1, 1, 1);
+  return label;
 }

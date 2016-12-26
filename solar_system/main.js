@@ -2,8 +2,7 @@ var lastTime = Date.now();
 var center = {x: 0, y: 0, z: 0};
 var deltaT = 0;
 var fps;
-var paused = false;
-var timeWarp = 1000000;
+var centuriesPerSecond = 0.0002;
 var followedObjectId = -1; //-1 is the center;
 
 var scene, aspect_ratio, camera, renderer, controls;
@@ -35,22 +34,23 @@ var planets = [
 var followablePlanets = planets;
 
 var colors = [
-  0xa6e97d,  //Mercury
-  0xf6f57b,  //Venus
-  0x42A5F5,  //Earth
-  0xfa7f95,  //Mars
-  0x9bf5ea,  //Jupiter
-  0xf9d27e,  //Saturn
-  0x8e7bec,  //Uranus
-  0xa34949,  //Neptune
-  0x74b16d,  //Pluto
+  0x385535,  //Mercury
+  0x83853b,  //Venus
+  0x364e60,  //Earth
+  0x753030,  //Mars
+  0x3b5e59,  //Jupiter
+  0x9e7a2b,  //Saturn
+  0x3b2f52,  //Uranus
+  0x6e4444,  //Neptune
+  0x497147,  //Pluto
 ];
 
 var celestialBodySprites = [];
 var orbits = [];
 
 var skyboxMesh;
-var planetSprite = THREE.ImageUtils.loadTexture("./res/planet.png");
+var planetSpriteTexture = THREE.ImageUtils.loadTexture("./res/planet.png");
+var asteroidSpriteTexture = THREE.ImageUtils.loadTexture("./res/asteroid.png");
 
 var canvasWidth, canvasHeight;
 
@@ -72,7 +72,6 @@ window.onload = function(){
 
   render();
 
-  document.getElementById('warp').innerHTML = timeWarp;
 }
 
 function render(){
@@ -84,11 +83,9 @@ function render(){
   var now = new Date().getTime();
   var sinceLastFrame = now - lastTime;
 
-  if(!paused){
-    epoch += sinceLastFrame / (100 * 1000 * SECONDS_IN_YEAR) * timeWarp;
-    updatePositionAndRotation();
+  epoch += sinceLastFrame / 1000 * centuriesPerSecond;
+  updatePositionAndRotation();
 
-  }
   updateCamera();
   document.getElementById('date').innerHTML=unixToString(epochToUnixTime(epoch));
   controls.update();
@@ -137,7 +134,7 @@ function enableObjectsCloseToSun(){
 
 function createSprites(){
   for(planet of planets){
-    celestialBodySprites.push(new CelestialBodySprite(planet, planetSprite, 20, true));
+    celestialBodySprites.push(new CelestialBodySprite(planet, planetSpriteTexture, 20, true));
   }
 }
 
@@ -273,7 +270,7 @@ function addNumberedBodies(file){
         while(meanAnomaly2000 < 0) meanAnomaly2000 += 2 * Math.PI;
 
         var asteroid = new CelestialBody(name, semiMajorAxis, eccentricty, inclination, longitudeOfNode, longitudeOfPericenter, meanAnomaly2000);
-        var asteroidSprite = new CelestialBodySprite(asteroid, planetSprite, 10, false, ASTEROID_BELT_FLAG);
+        var asteroidSprite = new CelestialBodySprite(asteroid, asteroidSpriteTexture, 4, false, ASTEROID_BELT_FLAG);
         planets.push(asteroid);
         celestialBodySprites.push(asteroidSprite);
         scene.add(asteroidSprite.symbol);
@@ -307,7 +304,7 @@ function addUnumberedBodies(file){
         while(meanAnomaly2000 < 0) meanAnomaly2000 += 2 * Math.PI;
 
         var asteroid = new CelestialBody(name, semiMajorAxis, eccentricty, inclination, longitudeOfNode, longitudeOfPericenter, meanAnomaly2000);
-        var asteroidSprite = new CelestialBodySprite(asteroid, planetSprite, 10, false, ASTEROID_BELT_FLAG);
+        var asteroidSprite = new CelestialBodySprite(asteroid, asteroidSpriteTexture, 4, false, ASTEROID_BELT_FLAG);
         planets.push(asteroid);
         celestialBodySprites.push(asteroidSprite);
     //    scene.add(asteroidSprite.label);
@@ -334,7 +331,7 @@ function init(){
   scene.background = new THREE.Color(0x111111);
 
   renderer.domElement.style="position:absolute; top:0px; left:0px; margin:0px; "
-  document.body.appendChild(renderer.domElement);
+  document.getElementById('bellowAbout').appendChild(renderer.domElement);
   camera.position.z = 2;
 
   controls = new THREE.TrackballControls(camera, renderer.domElement);

@@ -5,6 +5,7 @@ var followedObjectName = "None";
 var followableNames = []
 
 var showAsteroids = true;
+var showSkybox = true;
 
 var searchString = "Ceres";
 var searchResultsShow = [];
@@ -20,9 +21,10 @@ function loadGUI(){
   var container = document.getElementById("guiContainer");
   container.appendChild(datGUI.domElement);
 
-  datGUI.add(this, 'timeWarp', -100000000, +100000000).name("Time Warp").step(1).listen();
+  datGUI.add(this, 'centuriesPerSecond', -0.1, +0.1).name("Speed").step(0.00001).listen();
   pauseButton = datGUI.add(this, 'tooglePause').name("Pause").listen();
-  datGUI.add(this, 'showAsteroids').name("Show Asteroid Belts").onChange(toogleAsteroidBelts);
+  datGUI.add(this, 'showAsteroids').name("Show Belts").onChange(toogleAsteroidBelts);
+  datGUI.add(this, 'showSkybox').name("Show Skybox").onChange(toogleSkybox);
 
   followDropDown = datGUI.add(this, 'followedObjectName', followableNames).name("Follow").onChange(followListener).listen();
 
@@ -30,8 +32,6 @@ function loadGUI(){
   searchFolder.add(this, 'searchString').name("Designation");
   searchFolder.add(this, 'search').name("Search").listen();
   searchFolder.open();
-
-
 }
 
 function toogleAsteroidBelts(){
@@ -40,6 +40,15 @@ function toogleAsteroidBelts(){
   }
   else{
     disableAsteroidBelts();
+  }
+}
+
+function toogleSkybox(){
+  if(showSkybox){
+    scene.add(skyboxMesh);
+  }
+  else{
+    scene.remove(scene.getObjectById(skyboxMesh.id));
   }
 }
 
@@ -94,9 +103,12 @@ function addResult(resultSprite, resultOrbit){
   searchResultsFolder.add(searchResultsShow, resultIndex).name(resultSprite.planet.name).listen().onChange(updateSearchResult);
   searchResultsSprites.push(resultSprite);
   searchResultsOrbits.push(resultOrbit);
-  searchResultsFolder.open();
   updateSearchResult();
   resultIndex++;
+}
+
+function finishSearch(){
+  searchResultsFolder.open();
 }
 
 function deleteGUI(){
@@ -122,11 +134,14 @@ function updateSearchResult(){
 }
 
 function tooglePause(){
-  paused = !paused;
-  if(paused)
+  if(centuriesPerSecond != 0){
     pauseButton.name("Start");
-  else
+    centuriesPerSecond = 0;
+  }
+  else{
     pauseButton.name("Pause");
+    centuriesPerSecond = 0.0002;
+  }
 }
 
 function createFollowablePlanetsArray(){
@@ -158,10 +173,10 @@ window.onkeydown = function (e) {
       tooglePause();
     }
     else if(code === 39){ //RIGHT ARROW
-      timeWarp *= 2;
+      centuriesPerSecond *= 1.1;
     }
     else if(code === 37){  //LEFT ARROW
-      timeWarp /= 2;
+      centuriesPerSecond /= 1.1;
     }
 
     else if(code === 79){
