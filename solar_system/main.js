@@ -17,6 +17,8 @@ var maxDistanceOfObject = 5;  //objects from this distance dissapear
 
 var showOrbits = true;
 
+var doNotUpdate = false;
+
 //new CelestialBody(name,semiMajorAxis, eccentricty, inclination, longitudeOfNode, longitudeOfPericenter, meanAnomaly2000)
 
 var planets = [
@@ -56,7 +58,12 @@ var canvasWidth, canvasHeight;
 
 window.onload = function(){
   loadGUI();
-  init();
+  try{
+    init();
+  }
+  catch(err){
+    document.getElementById("error").style.display = "block ";
+  }
   createSkybox();
   createOrbits();
   createSun();
@@ -83,8 +90,10 @@ function render(){
   var now = new Date().getTime();
   var sinceLastFrame = now - lastTime;
 
-  epoch += sinceLastFrame / 1000 * centuriesPerSecond;
-  updatePositionAndRotation();
+  if(!doNotUpdate){
+    epoch += sinceLastFrame / 1000 * centuriesPerSecond;
+    updatePositionAndRotation();
+  }
 
   updateCamera();
   document.getElementById('date').innerHTML=unixToString(epochToUnixTime(epoch));
@@ -328,10 +337,13 @@ function init(){
 
 
   renderer.setSize(canvasWidth, canvasHeight);
-  scene.background = new THREE.Color(0x111111);
+  scene.background = new THREE.Color(0x020202);
 
   renderer.domElement.style="position:absolute; top:0px; left:0px; margin:0px; "
+
   document.getElementById('bellowAbout').appendChild(renderer.domElement);
+
+
   camera.position.z = 2;
 
   controls = new THREE.TrackballControls(camera, renderer.domElement);
