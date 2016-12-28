@@ -50,6 +50,8 @@ function showHelp(){
 
   aboutDiv.classList.add('showAbout');
   bellowDiv.classList.add('blurBellow');
+
+  doNotUpdate = true;
 }
 
 function closeHelp(){
@@ -58,6 +60,8 @@ function closeHelp(){
 
   aboutDiv.classList.remove('showAbout');
   bellowDiv.classList.remove('blurBellow');
+
+  doNotUpdate = false;
 }
 
 function toogleSkybox(){
