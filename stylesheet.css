@@ -20,26 +20,47 @@ body{
   top: 0px;
   width: 100%;
   margin: 0px;
-  height: 80px;
-  text-align: center;
+  height: 5em;
   border-style: solid;
+  text-align: center;
   border-color: #212121;
   border-width: 0px 0px 2px 0px;
 
 }
  #title h1{
-   display: inline-block;
+   display: inline;
    position: relative;
    vertical-align: middle;
    font-size: 40px;
+   left: 50px;
+   float: left;
  }
 
- #title h2{
+ #title a{
+   display: inline;
+   vertical-align: middle;
    position: relative;
-   display: inline-block;
-   left: 20%;
-   margin-right: 30px;
-   font-size: 80%;
+   margin-right: 20px;
+   font-size: 25px;
+   color: #fff;
+   padding: 5px;
+   float: right;
+   text-decoration: none;
+   right: 50px;
+   top: 1em;
+
+
+   -webkit-transition: 90ms;
+    -moz-transition: 90ms;
+    -o-transition: 90ms;
+    transition: 90ms;
+
+ }
+
+ #title a:hover{
+   background-color: #fff;
+   color: #c0392b;
+   border-radius: 2px;
  }
 
 
@@ -73,9 +94,7 @@ body{
   -o-filter: grayscale(100%);
   filter: grayscale(100%);
 
-
-
-  -webkit-transition: 200ms;
+ -webkit-transition: 200ms;
   -moz-transition: 200ms;
   -o-transition: 200ms;
   transition: 200ms;
