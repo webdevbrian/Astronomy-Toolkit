@@ -6,6 +6,8 @@ body{
 }
 
 #error{
+  display: none;
+
   z-index: 0;
   background-color: black;
   position: absolute;

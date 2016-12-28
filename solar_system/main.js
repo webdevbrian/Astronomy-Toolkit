@@ -58,10 +58,11 @@ var canvasWidth, canvasHeight;
 
 window.onload = function(){
   loadGUI();
-  init();
-
-  if(!renderer){
-    renderer.domElement.style = "display: none";
+  try{
+    init();
+  }
+  catch(err){
+    document.getElementById("error").style.display = "block ";
   }
   createSkybox();
   createOrbits();
