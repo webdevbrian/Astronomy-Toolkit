@@ -28,19 +28,20 @@ body{
 
 }
  #title h1{
-   display: inline;
+   display: inline-block;
    position: relative;
    vertical-align: middle;
+   text-align: center;
    font-size: 40px;
-   left: 50px;
-   float: left;
+   /*left: 50px;*/
+   /*float: left;*/
  }
 
  #title a{
    display: inline;
    vertical-align: middle;
    position: relative;
-   margin-right: 20px;
+   margin-right: 17px;
    font-size: 25px;
    color: #fff;
    padding: 5px;
@@ -56,14 +57,14 @@ body{
     transition: 90ms;
 
  }
-
+/*
  #title a:hover{
    background-color: #fff;
    color: #c0392b;
    border-radius: 2px;
  }
 
-
+*/
 #pages_container{
   position: relative;
   left: 15% ;
