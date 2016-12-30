@@ -21,6 +21,7 @@
 3. Jean Meeus - Astronomical Algorithms, Second Edition
 4. [Map Projections - A Working Manual](http://eaps.mit.edu/12.114/Map_projections_a_working_manual.pdf)
 5. [Small-Body Orbital Elements from NASA](http://ssd.jpl.nasa.gov/?sb_elem)
+6. [Felix R. Hoots, Ronald L. Roehrich - Models for Propagation of NORAD Element Sets](http://www.celestrak.com/NORAD/documentation/spacetrk.pdf)
 
 ### Used libraries
 1. [THREE.js](https://github.com/mrdoob/three.js/)

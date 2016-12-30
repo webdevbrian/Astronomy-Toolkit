@@ -64,6 +64,7 @@ window.onload = function(){
   catch(err){
     document.getElementById("error").style.display = "block ";
   }
+
   createSkybox();
   createOrbits();
   createSun();

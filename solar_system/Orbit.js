@@ -1,5 +1,10 @@
 var Orbit = function(celestialBody, color){
   this.mesh = createOrbitGeometry(celestialBody, color);
+  this.body = celestialBody;
+}
+
+Orbit.prototype.removeFrom = function (scene){
+  scene.remove(scene.getObjectById(this.mesh.id));
 }
 
 function createOrbitGeometry(celestialBody, color){
