@@ -18,11 +18,12 @@ var i =1;
 
 window.onload = function() {
 	startUp();
+	setSize();
 	time = Date.now();
 	timeInt = setInterval(writeDate, 1000);
 	writeDate();
 	drawStuff();
-    setInterval(drawStuff, 250);
+  setInterval(drawStuff, 250);
 	setInterval(keepTime, 10);
 	setInterval(dateInput, 5);
 }
@@ -33,17 +34,19 @@ window.onresize=function() {
 }
 
 function setSize(){
-	var oldSize = Math.min(canv.width, canv.height);
     var testWidth = getBrowserWidth() * 0.978;
     var testHeight = getBrowserHeight() * 0.978;
     var size = Math.min(testWidth, testHeight);
-    if(size > 895 && size < 1030){
-    	canv.width = size;
-        canv.height = size;
+    if(size > 895){
+			var realSize = size * window.devicePixelRatio;
+	  	canv.width = realSize;
+	    canv.height = realSize;
     }
     else{
-    	canv.width=900 ;
-        canv.height=900 ;
+    	canv.width = 900 * window.devicePixelRatio;
+      canv.height = 900 * window.devicePixelRatio;
+
+			size = 900;
     }
 
     height = canv.height;
@@ -52,7 +55,9 @@ function setSize(){
 
     //document.style.width = canv.width;
     //canv.style.height = canv.height;
-    document.getElementById("starmap").style.marginLeft = -width/2+"px";
+		var starmapDOM = document.getElementById("starmap")
+    starmapDOM.style.marginLeft = -size/2+"px";
+		starmapDOM.style.width = starmapDOM.style.height = size + "px";
 //  ctx = canv.getContext("2d");
 //  drawStuff();
 }
@@ -64,7 +69,7 @@ function drawStuff(){
     var t = Date.now();
 	JD = getJD();
 	theta = SideralTime(JD)*Math.PI/180+longitude; //theta is the local sideral time
-	if(isPrintFr) ctx.fillStyle = "#ADC9DB"; 
+	if(isPrintFr) ctx.fillStyle = "#ADC9DB";
 	else ctx.fillStyle = "#002C4A"; //Prussian blue
 	ctx.fillRect(0, 0, width, height);
 	ctx.fillStyle = "#00233B";
@@ -91,8 +96,8 @@ function drawStuff(){
 	ctx.arc(height/2, height/2, height/2-10, 0, 2*Math.PI);
 	ctx.closePath();
 	ctx.clip();
-	
-	
+
+
 	if(document.getElementById("milkyWay").checked && zoom == 1) drawMilkyWay();
 	if (document.getElementById("lines").checked) {
 		drawLines(); //draws the constellation lines
@@ -100,12 +105,12 @@ function drawStuff(){
 	//drawBounds();
 	ctx.font = "10px Arial";
 	drawStars(); //draws the stars
-	if (document.getElementById("messier").checked) 
+	if (document.getElementById("messier").checked)
 		drawDSO(); //draws deep space objects
 	ctx.font = "12px Arial";
 	if(isPrintFr) ctx.fillStyle = "#1C1C1C";
 	else ctx.fillStyle="#FCB3EA";
-	if (document.getElementById("names").checked) 
+	if (document.getElementById("names").checked)
 		drawConNames(); //draws constellation names
 	if(document.getElementById("planets").checked){
 	 	drawPlanets();
@@ -123,21 +128,21 @@ function drawStuff(){
 //    ctx.drawImage(document.getElementById("logo"), height-size*0.86+3, height-size-3, size*0.86, size);
 	if(document.getElementById("points").checked) drawCardPoints();
 	ctx.lineWidth=1;
-	
+
     if(logTime) console.log(Date.now()-t);
 }
 
 function drawLines(){
 	var T = (JD-2451545)/36525;
-	
+
 	var m = 15*deg2rad(3.07496 + 0.00186*T)/3600;
 	var n = 15*deg2rad(1.33621-0.00057*T)/3600;
 	var n1 = deg2rad(20.0431 - 0.0085*T)/3600;
-	
+
 	if(zoom == 1) ctx.lineWidth=1;
 	else if(zoom == 2) ctx.lineWidth=1.25;
 	else ctx.lineWidth=1.5;
-	if(isPrintFr) ctx.strokeStyle='#A0A0A0'; 
+	if(isPrintFr) ctx.strokeStyle='#A0A0A0';
 	else ctx.strokeStyle='#2D4A5E';
 	ctx.beginPath()
 	for (var line=0; line<conRA.length; line++) {
@@ -155,7 +160,7 @@ function drawLines(){
 	}
 	ctx.closePath();
 	ctx.stroke();
-	
+
 }
 
 function drawMilkyWay(){
@@ -167,7 +172,7 @@ function drawMilkyWay(){
 	for(var i = 0; i < milkyway.length; i++){
 		if(lat-milkyway[i].de<Math.PI/2){
 			var posEquatorial = calcPrecession(milkyway[i].de, milkyway[i].ra)
-			
+
 			var pos = projectStereo(posEquatorial.dec, posEquatorial.ra, true);
 			isAboveHor = Math.pow(pos.x-height/2, 2)+Math.pow(pos.y-height/2, 2) < Math.pow(height/2+8, 2);
 		}
@@ -195,7 +200,7 @@ function drawBounds(){
 			isAboveHor = Math.pow(pos.x-height/2, 2)+Math.pow(pos.y-height/2, 2) < Math.pow(height/2+8, 2);
 		}
 		else isAboveHor = false;
-		
+
 		if (isAboveHor) {
 			if(bounds[i].con != cname){
 				ctx.beginPath();
@@ -260,7 +265,7 @@ function drawDSO(){
 	for (var mes = 0; mes < 110; mes++){
 		var coordEquatorial = calcPrecession(mesDE[mes], mesRA[mes]);
 		var coord=projectStereo(coordEquatorial.dec, coordEquatorial.ra, false);
-		
+
 		if (coord) {
 			if (mesType[mes] == 'GC') gcSymbol(coord['x'], coord['y'], 4);
 			if (mesType[mes] == 'GX') gxSymbol(coord['x'], coord['y'], 4, 2);
@@ -274,7 +279,7 @@ function drawDSO(){
 			}
 		}
 	}
-	
+
 	//ctx.beginPath();
 }
 
@@ -305,7 +310,7 @@ function SideralTime(JD){
 
 
 function getJD(){
-	//returns Julian Days 
+	//returns Julian Days
     var dateObj = new Date(unixTime);
 	var day = dateObj.getUTCDate()+dateObj.getUTCHours()/24.00+dateObj.getUTCMinutes()/1440.00+dateObj.getUTCSeconds()/86400;
 	var month = dateObj.getUTCMonth() + 1;
@@ -380,5 +385,3 @@ function keepTime(){
 	unixTime+=(Date.now()-time);
 	time = Date.now();
 }
-
-

@@ -1,3 +1,5 @@
+var AU_IN_SCREEN_UNITS = 1;
+
 var lastTime = Date.now();
 var center = {x: 0, y: 0, z: 0};
 var deltaT = 0;
@@ -65,6 +67,7 @@ window.onload = function(){
     document.getElementById("error").style.display = "block ";
   }
 
+  resize();
   createSkybox();
   createOrbits();
   createSun();
@@ -83,7 +86,6 @@ window.onload = function(){
 }
 
 function render(){
-  fps++;
   updateScales();
   updateSkybox();
   checkForOverlap();
@@ -99,6 +101,8 @@ function render(){
   updateCamera();
   document.getElementById('date').innerHTML=unixToString(epochToUnixTime(epoch));
   controls.update();
+
+  fps++;
 
   deltaT += sinceLastFrame;
   lastTime = now;
@@ -222,7 +226,7 @@ function toogleOrbits(){
 
 
 function createSkybox(){
-  var geometry = new THREE.SphereGeometry(1000, 90, 90);
+  var geometry = new THREE.SphereGeometry(180, 90, 90);
   var texture = new THREE.ImageUtils.loadTexture('./res/milky_way.jpg');
   var material = new THREE.MeshBasicMaterial({
     map:  texture,
@@ -248,10 +252,17 @@ function createSun(){
 }
 
 window.onresize = function(e){
-  canvasWidth = getBrowserWidth();
-  canvasHeight = getBrowserHeight();
+  resize();
+}
 
+function resize(){
+
+  canvasWidth = Math.floor(getBrowserWidth() * window.devicePixelRatio);
+  canvasHeight = Math.floor(getBrowserHeight() * window.devicePixelRatio);
+  console.log(canvasWidth + "  " + canvasHeight + " " + getBrowserWidth() + " " + window.devicePixelRatio);
   renderer.setSize(canvasWidth, canvasHeight);
+  renderer.domElement.style.width = getBrowserWidth() + "px";
+  renderer.domElement.style.height = getBrowserHeight() + "px";
   camera.aspect = canvasWidth / canvasHeight;
   camera.updateProjectionMatrix();
 }
@@ -332,15 +343,15 @@ function init(){
   canvasWidth = getBrowserWidth();
   canvasHeight = getBrowserHeight();
   aspect_ratio = canvasWidth / canvasHeight;
-  camera = new THREE.PerspectiveCamera(75, aspect_ratio, 0.0000000001, 10000);
+  camera = new THREE.PerspectiveCamera(75, aspect_ratio, 0.01, 200);
   camera.lookAt(new THREE.Vector3(0,0,0));
-  renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer = new THREE.WebGLRenderer({antialias:true, });
 
 
   renderer.setSize(canvasWidth, canvasHeight);
   scene.background = new THREE.Color(0x020202);
 
-  renderer.domElement.style="position:absolute; top:0px; left:0px; margin:0px; "
+  renderer.domElement.style="position:absolute; top:0px; left:0px; margin:0px; width: 100%; height: 100%;"
 
   document.getElementById('bellowAbout').appendChild(renderer.domElement);
 

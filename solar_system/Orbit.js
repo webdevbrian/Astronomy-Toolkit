@@ -1,5 +1,5 @@
-var Orbit = function(celestialBody, color){
-  this.mesh = createOrbitGeometry(celestialBody, color);
+var Orbit = function(celestialBody, color, au2screen){
+  this.mesh = createOrbitGeometry(celestialBody, color, au2screen);
   this.body = celestialBody;
 }
 
@@ -15,7 +15,7 @@ function createOrbitGeometry(celestialBody, color){
   for(var i = 0; i <= segmentCount; i++){
     var angle = 2 * i * Math.PI / segmentCount;
     var position = celestialBody.getCartesianCoordinates(angle);
-    var vector  = new THREE.Vector3(position.x, position.y , position.z);
+    var vector  = new THREE.Vector3(position.x, position.y, position.z);
     geometry.vertices.push(vector);
   }
   var mesh = new THREE.Line(geometry, material);

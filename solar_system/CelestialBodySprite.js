@@ -1,4 +1,4 @@
-var labelCanvasSize = 256;
+ var labelCanvasSize = 256;
 
 function CelestialBodySprite(planet, texture, spriteSize, showLabel, flag){
   this.planet = planet;
@@ -44,9 +44,18 @@ CelestialBodySprite.prototype.updateScale  = function(camera, width, height){
 
 
 CelestialBodySprite.prototype.createSprite  = function(){
-  var material = new THREE.SpriteMaterial( { map: this.texture, transparent:true, color:0xffffff} );
+  var material = new THREE.SpriteMaterial({
+    map: this.texture,
+    blending:THREE.AdditiveBlending,
+    color:0xbebebe,
+    side:THREE.BackSide,
+    depthWrite: false,
+    depthTest: false
+  });
+
 	var sprite = new THREE.Sprite(material);
 	sprite.scale.set(0.2, 0.2, 0.2);
+	sprite.renderDepth = -1;
   return sprite;
 }
 
@@ -56,7 +65,6 @@ CelestialBodySprite.prototype.createLabelSprite  = function(){
   canvas.height = labelCanvasSize;
   var ctx = canvas.getContext('2d');
   ctx.font = "Bold 14px Arial";
-
   var fontMetrics = ctx.measureText(this.planet.name);
   labelWidth = fontMetrics.width;
   ctx.clearRect(0,0, labelCanvasSize, labelCanvasSize);
@@ -66,12 +74,16 @@ CelestialBodySprite.prototype.createLabelSprite  = function(){
   var texture = new THREE.Texture(canvas);
   texture.minFilter = THREE.LinearFilter;
   texture.needsUpdate = true;
-//  texture.magFilter = THREE.NearestFilter;
-//  texture.minFilter = THREE.LinearMipMapLinearFilter;
 
-
-  var material = new THREE.SpriteMaterial({map :texture, transparent:true});
+  var material = new THREE.SpriteMaterial({
+    map :texture,
+    transparent: true,
+    side:THREE.BackSide,
+    depthWrite: false,
+    depthTest: false,
+  });
   var label = new THREE.Sprite(material);
   label.scale.set(1, 1, 1);
+  label.renderDepth = -1;
   return label;
 }

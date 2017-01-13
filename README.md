@@ -2,14 +2,15 @@
 
 ![Skychart Photo](http://i.imgur.com/JPqbVw6.png)
 
-![Solar System Photo](http://i.imgur.com/p0vaf6H.png)
+![Solar System Photo](http://i.imgur.com/fqtLaAk.png)
 
 ### Features
 * JavaScript skychart
 * THREE.js Solar System
+* N-Body Simulator
 
 ### Upcoming Features
-* THREE.js Artificial Satellites
+* N-Body Simulator
 * Eclipses Animations
 * Astronomical Clock
 * Daily Ephemerides
