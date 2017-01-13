@@ -86,7 +86,6 @@ window.onload = function(){
 }
 
 function render(){
-  fps++;
   updateScales();
   updateSkybox();
   checkForOverlap();
@@ -102,6 +101,8 @@ function render(){
   updateCamera();
   document.getElementById('date').innerHTML=unixToString(epochToUnixTime(epoch));
   controls.update();
+
+  fps++;
 
   deltaT += sinceLastFrame;
   lastTime = now;
