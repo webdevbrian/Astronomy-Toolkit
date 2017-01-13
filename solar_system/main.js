@@ -14,8 +14,8 @@ var ASTEROID_BELT_FLAG = 'asteroid_belt'
 var epoch = unixToEpoch(Date.now() / 1000.0);
 
 var showObjectsCloseToSun = true;
-var maxDistanceOfCamera = 40 * AU_IN_SCREEN_UNITS; //from this distance the objects close to the sun dissapear
-var maxDistanceOfObject = 5 * AU_IN_SCREEN_UNITS;  //objects from this distance dissapear
+var maxDistanceOfCamera = 40; //from this distance the objects close to the sun dissapear
+var maxDistanceOfObject = 5;  //objects from this distance dissapear
 
 var showOrbits = true;
 
@@ -67,6 +67,7 @@ window.onload = function(){
     document.getElementById("error").style.display = "block ";
   }
 
+  resize();
   createSkybox();
   createOrbits();
   createSun();
@@ -191,7 +192,7 @@ function updateCamera(){
 function updatePositionAndRotation(){
   for(bodySprite of celestialBodySprites){
     if(bodySprite.shouldDisplay)
-      bodySprite.updatePosition(epoch, AU_IN_SCREEN_UNITS);
+      bodySprite.updatePosition(epoch);
   }
 }
 
@@ -201,7 +202,7 @@ function updateSkybox(){
 
 function createOrbits(){
   for(var i = 0; i < planets.length; i++){
-    orbits.push(new Orbit(planets[i], colors[i], AU_IN_SCREEN_UNITS));
+    orbits.push(new Orbit(planets[i], colors[i]));
   }
 }
 
@@ -224,7 +225,7 @@ function toogleOrbits(){
 
 
 function createSkybox(){
-  var geometry = new THREE.SphereGeometry(180 * AU_IN_SCREEN_UNITS, 90, 90);
+  var geometry = new THREE.SphereGeometry(180, 90, 90);
   var texture = new THREE.ImageUtils.loadTexture('./res/milky_way.jpg');
   var material = new THREE.MeshBasicMaterial({
     map:  texture,
@@ -243,17 +244,24 @@ function createSun(){
   var flareTexture = THREE.ImageUtils.loadTexture("./res/flare.png");
   var flareMaterial = new THREE.SpriteMaterial({map: flareTexture, blending:THREE.AdditiveBlending, useScreenCoordinates: false, color: 0xffffff});
   var flareSprite = new THREE.Sprite(flareMaterial);
-  flareSprite.scale.set(0.8 * AU_IN_SCREEN_UNITS, 0.8 * AU_IN_SCREEN_UNITS, 0.8 * AU_IN_SCREEN_UNITS);
+  flareSprite.scale.set(0.8, 0.8, 0.8);
   flareSprite.position.set(0, 0, 0);
   scene.add(flareSprite);
 
 }
 
 window.onresize = function(e){
-  canvasWidth = getBrowserWidth();
-  canvasHeight = getBrowserHeight();
+  resize();
+}
 
+function resize(){
+
+  canvasWidth = Math.floor(getBrowserWidth() * window.devicePixelRatio);
+  canvasHeight = Math.floor(getBrowserHeight() * window.devicePixelRatio);
+  console.log(canvasWidth + "  " + canvasHeight + " " + getBrowserWidth() + " " + window.devicePixelRatio);
   renderer.setSize(canvasWidth, canvasHeight);
+  renderer.domElement.style.width = getBrowserWidth() + "px";
+  renderer.domElement.style.height = getBrowserHeight() + "px";
   camera.aspect = canvasWidth / canvasHeight;
   camera.updateProjectionMatrix();
 }
@@ -342,18 +350,18 @@ function init(){
   renderer.setSize(canvasWidth, canvasHeight);
   scene.background = new THREE.Color(0x020202);
 
-  renderer.domElement.style="position:absolute; top:0px; left:0px; margin:0px; "
+  renderer.domElement.style="position:absolute; top:0px; left:0px; margin:0px; width: 100%; height: 100%;"
 
   document.getElementById('bellowAbout').appendChild(renderer.domElement);
 
 
-  camera.position.z = 2 * AU_IN_SCREEN_UNITS;
+  camera.position.z = 2;
 
   controls = new THREE.TrackballControls(camera, renderer.domElement);
   controls.rotateSpeed = 10;
   controls.zoomSpeed = 0.12;
   controls.rotateCamera();
   controls.minDistance = 0.1;
-  controls.maxDistance = 90 * AU_IN_SCREEN_UNITS;
+  controls.maxDistance = 90;
   controls.dynamicDampingFactor = 0.3;
 }
