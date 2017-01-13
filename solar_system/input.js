@@ -167,7 +167,6 @@ function tooglePause(){
 
 function createFollowablePlanetsArray(){
   followableNames = ["None"];
-  console.log("uaie");
   for(body of followablePlanets){
       followableNames.push(body.name);
   }
