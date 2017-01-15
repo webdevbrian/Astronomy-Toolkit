@@ -26,7 +26,7 @@ Body.prototype.addPosition = function(){
 
 };
 
-Body.prototype.update = function(step, scene){
+Body.prototype.update = function(step, trailLimit, scene){
 	this.velocityX += step * this.accelerationX;
 	this.velocityY += step * this.accelerationY;
 
@@ -36,7 +36,7 @@ Body.prototype.update = function(step, scene){
 	this.mesh.position.set(this.x, this.y, 0);
 
 	this.trailVertices.push(new THREE.Vector3(this.x, this.y, 0));
-	if(this.trailVertices.length > 500){
+	while(this.trailVertices.length > trailLimit){
 		this.trailVertices.shift();
 	}
 	scene.remove(this.trail);
