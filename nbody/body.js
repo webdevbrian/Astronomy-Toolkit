@@ -35,7 +35,7 @@ Body.prototype.update = function(step, trailLimit, scene){
 
 	this.mesh.position.set(this.x, this.y, 0);
 
-	this.trailVertices.push(new THREE.Vector3(this.x, this.y, 0));
+	this.trailVertices.push(new THREE.Vector3(this.x, this.y, -0.0001));
 	while(this.trailVertices.length > trailLimit){
 		this.trailVertices.shift();
 	}
