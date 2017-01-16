@@ -23,14 +23,22 @@ var paused = false;
 
 var solarSystemPreset = [
   new Body(1.0, 0.0, 0.0, 0.00, 0.00, 0.05, 0xF0C400),
-  new Body(0.01, 0.0, 0.4, 0.33, 0.00, 0.02, 0x1d5cfe),
-  new Body(0.01, 0.0, 0.8, 0.25, 0.00, 0.02, 0x2aa353),
+  new Body(0.000, 0.0, 0.30, 0.35, 0.00, 0.02, 0x1d5cfe),
+  new Body(0.000, 0.0, 0.50, 0.28, 0.00, 0.02, 0x479d2d),
+  new Body(0.000, 0.0, 0.65, 0.25, 0.00, 0.02, 0xc32121),
+  new Body(0.000, 0.0, 0.80, 0.25, 0.00, 0.02, 0x188a79),
+]
+
+var binaryStarsPreset = [
+  new Body(1.0, 0.0, +0.3, +0.20, 0.00, 0.05, 0xc32121),
+  new Body(1.0, 0.0, -0.3, -0.20, 0.00, 0.05, 0xF0C400),
+
 ]
 
 var bodies = cloneBodies(solarSystemPreset);
 
 window.onload = function(){
-  document.getElementById('bodies').innerHTML = bodies.length;
+  updateBodyNumber();
   init();
   initGUI();
 
@@ -59,10 +67,11 @@ function render(){
   }
 
   controls.update();
-  computeAccelerations();
   if(!paused){
-    for(var i = 0; i < stepsPerFrame; i++)
-      updateBodies();
+    for(var i = 0; i < stepsPerFrame; i++){
+    computeAccelerations();
+    updateBodies();
+    }
   }
   renderer.render(scene, camera);
   requestAnimationFrame(render);
@@ -83,12 +92,13 @@ function addMeshes(){
 }
 
 function computeAccelerations(){
-	for(var  i = 0; i < bodies.length; i++){
+  var n = bodies.length;
+	for(var  i = 0; i < n; i++){
 		bodies[i].resetAcceleration();
-		for(var j = 0; j < bodies.length; j++){
+		for(var j = 0; j < n; j++){
 			if(i != j){
 				var deltaX = bodies[j].x - bodies[i].x;
-				var deltaY = -bodies[i].y + bodies[j].y;
+				var deltaY = bodies[j].y - bodies[i].y;
 				var d = Math.sqrt(deltaX * deltaX + deltaY * deltaY) + smoothingFactor;
 				var acc = k * bodies[j].mass / (d * d);
 				bodies[i].accelerationX += acc * deltaX / d;
@@ -107,17 +117,8 @@ function getDownPosition(e){
 		beginY = endY = y;
 
     beginVector = screenToWorldCoordinates(beginX, beginY);
-    console.log(beginVector.x + " " + beginVector.y);
-
-    var lineMaterial = new THREE.LineBasicMaterial({color: 0xffffff});
-    var lineGeom = new THREE.Geometry();
-    lineGeom.vertices = [beginVector, beginVector];
-    arrowMesh = new THREE.Line(lineGeom, lineMaterial);
-
-    var direction = new THREE.Vector3().subVectors(beginVector, new THREE.Vector3(0.7, 0.5, 0.0));
-  //  arrowMesh = new THREE.ArrowHelper(direction.clone().normalize(), beginVector, 2.0, 0xffffff, 1.0, 1.0);
-    //arrowMesh.cone.visible = true;
-    scene.add(arrowMesh);
+    arrowMesh = new Arrow(beginVector, beginVector);
+    scene.add(arrowMesh.mesh);
 
     isPressed = true;
 	}
@@ -128,11 +129,8 @@ function getMovePosition(e){
 	if(isPressed){
 		endX = e.clientX;
 		endY = e.clientY;
-
     var endVector = screenToWorldCoordinates(endX, endY);
-    var direction = new THREE.Vector3().subVectors(endVector, beginVector);
-    arrowMesh.geometry.vertices[1] = endVector;
-    arrowMesh.geometry.verticesNeedUpdate = true;
+    arrowMesh.updateEnd(endVector)
 	}
 }
 
@@ -144,20 +142,19 @@ function getUpPosition(e){
     var endVector = screenToWorldCoordinates(endX, endY);
 		var velX = 0.5 * (endVector.x - beginVector.x);
 		var velY = 0.5 * (endVector.y - beginVector.y);
-    scene.remove(arrowMesh);
-		//size = computeRadius(bodyMass, bodyDensity);
+    scene.remove(arrowMesh.mesh);
 		var body = new Body(bodyMass, beginVector.x, beginVector.y, velX, velY, bodyRadius, randomColor({format: 'hex'}));
     scene.add(body.mesh);
     scene.add(body.trail);
 		bodies.push(body);
-    document.getElementById('bodies').innerHTML = bodies.length;
+    updateBodyNumber();
 	}
 }
 
 function screenToWorldCoordinates(x, y){
   var aspectRatio = canvasWidth / canvasHeight;
-  var worldX = (aspectRatio * (2.0 * x / getBrowserWidth() - 1.0) + camera.position.x) / camera.zoom;
-  var worldY = ((1.0 - 2.0 * y / getBrowserHeight()) + camera.position.y) / camera.zoom;
+  var worldX = (aspectRatio * (2.0 * x / getBrowserWidth() - 1.0)  / camera.zoom + camera.position.x);
+  var worldY = ((1.0 - 2.0 * y / getBrowserHeight())  / camera.zoom + camera.position.y);
 
   return new THREE.Vector3(worldX, worldY, 0);
 }
@@ -205,8 +202,11 @@ function initGUI(){
   worldFolder.add(this, 'trailLength', 0, 1000).step(1).name("Trail Length");
   worldFolder.open();
 
-  gui.add(this, 'clear').name("Clear ALL Bodies");
-  gui.add(this, 'reset').name("Reset System");
+  var presetFolder = gui.addFolder("Presets");
+  presetFolder.add(this, 'clear').name("Empty Universe");
+  presetFolder.add(this, 'addSolarSystem').name("3 Planet Solar System");
+  presetFolder.add(this, 'addBinaryStars').name("Binary Stars");
+  presetFolder.open();
 }
 
 function clear(){
@@ -215,12 +215,26 @@ function clear(){
     scene.remove(bodies[i].trail);
   }
   bodies = [];
+  updateBodyNumber();
 }
 
-function reset(){
+function addSolarSystem(){
   clear();
   bodies = cloneBodies(solarSystemPreset);
   addMeshes();
+  updateBodyNumber();
+}
+
+function addBinaryStars(){
+  clear();
+  bodies = cloneBodies(binaryStarsPreset);
+  addMeshes();
+  updateBodyNumber();
+
+}
+
+function updateBodyNumber(){
+  document.getElementById('bodies').innerHTML = bodies.length;
 }
 
 function init(){
