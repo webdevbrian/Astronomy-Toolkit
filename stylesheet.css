@@ -3,8 +3,8 @@ body{
   /*background-image: url("./res/starry_night.jpg");
   background-size:cover;
   background-attachment: fixed;
-  background-position: center;
-*/
+  background-position: center;*/
+
   color: #FFF;
   margin: 0px;
   font-family: Arial, Helvetica, sans-serif	;
@@ -15,12 +15,19 @@ body{
 
 #title{
   position: relative;
-  display: table;
-  background-color: #c0392b;
+  /*display: table;*/
+/*  background-color: #c0392b;*/
+  background-image: url("./res/starry_night.jpg");
+
+/*  background-size: contain;*/
+  background-attachment: fixed;
+  /*background-position: left;*/
+  background-repeat: repeat-x;
+  background-size: auto 250;
   top: 0px;
   width: 100%;
   margin: 0px;
-  height: 5em;
+  height: 20%;
   border-style: solid;
   text-align: center;
   border-color: #212121;
@@ -32,7 +39,12 @@ body{
    position: relative;
    vertical-align: middle;
    text-align: center;
-   font-size: 40px;
+   font-size: 60px;
+   text-shadow:
+   -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+     1px 1px 0 #000;
    /*left: 50px;*/
    /*float: left;*/
  }
