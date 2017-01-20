@@ -4,8 +4,8 @@ var smoothingFactor = 0.001;
 var k = 0.05;
 var timePerStep = 0.01;
 var stepsPerFrame = 1;
-var bodyMass = 0.0;
-var bodyRadius = 0.02;
+var bodyMass = 0.001;
+var bodyDensity = 90;
 var trailLength = 500;
 
 var canvasWidth, canvasHeight;
@@ -20,35 +20,46 @@ var fps;
 
 var paused = false;
 
+var sunPreset = [new Body(1.000, 0.0, 0.00, 0.00, 0.00, 900, 0xF0C400),]
 
 var solarSystemPreset = [
-  new Body(1.0, 0.0, 0.0, 0.00, 0.00, 0.05, 0xF0C400),
-  new Body(0.000, 0.0, 0.30, 0.35, 0.00, 0.02, 0x1d5cfe),
-  new Body(0.000, 0.0, 0.50, 0.28, 0.00, 0.02, 0x479d2d),
-  new Body(0.000, 0.0, 0.65, 0.25, 0.00, 0.02, 0xc32121),
-  new Body(0.000, 0.0, 0.80, 0.25, 0.00, 0.02, 0x188a79),
+  new Body(1.000, 0.0, 0.00, 0.00, 0.00, 900, 0xF0C400),
+  new Body(0.001, 0.0, 0.30, 0.35, 0.00, 90, 0x1d5cfe),
+  new Body(0.001, 0.0, 0.50, 0.28, 0.00, 90, 0x479d2d),
+  new Body(0.001, 0.0, 0.65, 0.25, 0.00, 90, 0xc32121),
+  new Body(0.001, 0.0, 0.80, 0.25, 0.00, 90, 0x188a79),
 ]
 
 var binaryStarsPreset = [
-  new Body(1.0, 0.0, +0.3, +0.20, 0.00, 0.05, 0xc32121),
-  new Body(1.0, 0.0, -0.3, -0.20, 0.00, 0.05, 0xF0C400),
+  new Body(1.0, 0.0, +0.3, +0.20, 0.00, 1500, 0xc32121),
+  new Body(1.0, 0.0, -0.3, -0.20, 0.00, 1500, 0xF0C400),
 
 ]
 
-var bodies = cloneBodies(solarSystemPreset);
+var bodies = [];//cloneBodies(solarSystemPreset);
 
 window.onload = function(){
-  updateBodyNumber();
-  init();
   initGUI();
 
-  resize();
+  updateBodyNumber();
 
+  try{
+    init();
+  }
+  catch(err){
+    document.getElementById("error").style.display = "block ";
+  }
+
+  resize();
   renderer.domElement.addEventListener("mousedown", getDownPosition, false);
   renderer.domElement.addEventListener("mouseup", getUpPosition, false);
   renderer.domElement.addEventListener("mousemove", getMovePosition, false);
 
-  addMeshes();
+  //addProtoDisk();
+  addSolarSystem();
+
+
+//  addMeshes();
 
   render();
 
@@ -70,6 +81,7 @@ function render(){
   if(!paused){
     for(var i = 0; i < stepsPerFrame; i++){
     computeAccelerations();
+    checkCollisions();
     updateBodies();
     }
   }
@@ -108,6 +120,28 @@ function computeAccelerations(){
   }
 }
 
+function checkCollisions(){
+	for(var i = 0; i < bodies.length; i++){
+		for(var j = 0; j < bodies.length; j++){
+			if(i != j && bodies[i].distanceToBody(bodies[j]) < bodies[i].size + bodies[j].size){
+				if(bodies[i].mass > bodies[j].mass){
+					bodies[i].mass += bodies[j].mass;
+          bodies[i].updateRadius();
+          bodies[j].removeFrom(scene);
+					bodies.splice(j, 1);
+				}
+				else{
+					bodies[j].mass += bodies[i].mass;
+          bodies[i].removeFrom(scene);
+          bodies[j].updateRadius();
+					bodies.splice(i, 1);
+				}
+        updateBodyNumber();
+			}
+		}
+	}
+}
+
 function getDownPosition(e){
 	var x = e.clientX;
 	var y = e.clientY;
@@ -143,7 +177,7 @@ function getUpPosition(e){
 		var velX = 0.5 * (endVector.x - beginVector.x);
 		var velY = 0.5 * (endVector.y - beginVector.y);
     scene.remove(arrowMesh.mesh);
-		var body = new Body(bodyMass, beginVector.x, beginVector.y, velX, velY, bodyRadius, randomColor({format: 'hex'}));
+		var body = new Body(bodyMass, beginVector.x, beginVector.y, velX, velY, bodyDensity, randomColor({format: 'hex'}));
     scene.add(body.mesh);
     scene.add(body.trail);
 		bodies.push(body);
@@ -162,7 +196,7 @@ function screenToWorldCoordinates(x, y){
 function cloneBodies(array){
 	var returnedArray = [];
 	for(var  i = 0; i < array.length; i++){
-		body = new Body(array[i].mass, array[i].x, array[i].y, array[i].velocityX, array[i].velocityY, array[i].size, array[i].color);
+		body = new Body(array[i].mass, array[i].x, array[i].y, array[i].velocityX, array[i].velocityY, array[i].density, array[i].color);
 		body.setPositions(array[i].positionsX, array[i].positionsY);
 		returnedArray.push(body);
 	}
@@ -189,24 +223,51 @@ function resize(){
 }
 
 function initGUI(){
-  var gui = new dat.GUI();
+  var gui = new dat.GUI({autoplace: false});
+  var container = document.getElementById("guiContainer");
+  container.appendChild(gui.domElement);
+
+  gui.add(this, 'showHelp').name("Help");
   var bodyFolder = gui.addFolder("Body Settings");
-  bodyFolder.add(this, 'bodyMass', 0, 2).step(0.001).name("Mass");
-  bodyFolder.add(this, 'bodyRadius', 0, 0.5).step(0.001).name("Radius");
+  bodyFolder.add(this, 'bodyMass', 0.001, 2).step(0.001).name("Mass");
+  bodyFolder.add(this, 'bodyDensity', 90, 1000).step(0.001).name("Density");
   bodyFolder.open();
 
   var worldFolder = gui.addFolder("Simulation Settings");
   worldFolder.add(this, 'k', 0, 0.06).step(0.000001).name("G Constant");
   worldFolder.add(this, 'timePerStep', 0, 0.05).step(0.0001).name("Time Per Step");
-  worldFolder.add(this, 'stepsPerFrame', 0, 10).step(1).name("Steps Per Frame");
+  worldFolder.add(this, 'stepsPerFrame', 0, 10).step(1).name("Steps Per Frame").listen();
   worldFolder.add(this, 'trailLength', 0, 1000).step(1).name("Trail Length");
   worldFolder.open();
 
   var presetFolder = gui.addFolder("Presets");
   presetFolder.add(this, 'clear').name("Empty Universe");
+  presetFolder.add(this, 'addSun').name("A Single Star");
   presetFolder.add(this, 'addSolarSystem').name("3 Planet Solar System");
   presetFolder.add(this, 'addBinaryStars').name("Binary Stars");
+	presetFolder.add(this, 'addProtoDisk').name("Protoplanetary Disk");
   presetFolder.open();
+}
+
+function showHelp(){
+  var aboutDiv = document.getElementById('about');
+  var bellowDiv = document.getElementById('bellowAbout');
+
+  aboutDiv.classList.add('showAbout');
+  bellowDiv.classList.add('blurBellow');
+
+  stepsPerFrame = 0;
+}
+
+function closeHelp(){
+  var aboutDiv = document.getElementById('about');
+  var bellowDiv = document.getElementById('bellowAbout');
+
+  aboutDiv.classList.remove('showAbout');
+  bellowDiv.classList.remove('blurBellow');
+
+  stepsPerFrame = 1;
+
 }
 
 function clear(){
@@ -225,12 +286,41 @@ function addSolarSystem(){
   updateBodyNumber();
 }
 
+function addSun(){
+  clear();
+  bodies = cloneBodies(sunPreset);
+  addMeshes();
+  updateBodyNumber();
+}
+
 function addBinaryStars(){
   clear();
   bodies = cloneBodies(binaryStarsPreset);
   addMeshes();
   updateBodyNumber();
 
+}
+
+
+function addProtoDisk(){
+	clear();
+	var sunMass = 1.0;
+	var sun = new Body(sunMass, 0, 0, 0, 0, 1500, 0xF0C400);
+  bodies.push(sun);
+  sun.addTo(scene);
+	var particleMass = 0.00005;
+	for(var i = 0; i < 250; i++){
+    var x = 1 - 2 * Math.random() + 0.1;
+		var y = 1 - 2 * Math.random() + 0.1;
+		var radius = Math.sqrt(x * x + y * y);
+		var speed = Math.sqrt(k * sunMass / radius);
+		var speedX = speed * y / radius;
+		var speedY = - speed * x / radius;
+		var particle = new Body(particleMass, x, y, speedX, speedY, 100, randomColor({format: 'hex'}));
+		bodies.push(particle);
+		particle.addTo(scene);
+	}
+  updateBodyNumber();
 }
 
 function updateBodyNumber(){
@@ -252,7 +342,7 @@ function init(){
 
   renderer.domElement.style="position:absolute; top:0px; left:0px; margin:0px; width: 100%; height: 100%;"
 
-  document.body.appendChild(renderer.domElement);
+  document.getElementById('bellowAbout').appendChild(renderer.domElement);
 
   camera.position.z = 1;
   camera.zoom = 1;

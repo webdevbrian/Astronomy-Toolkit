@@ -13,6 +13,11 @@ body{
 
 /*Main CSS from top to bottom*/
 
+@keyframes animatedBackground {
+	from { background-position: 0 0; }
+	to { background-position: 100% 0; }
+}
+
 #title{
   position: relative;
   /*display: table;*/
@@ -21,6 +26,8 @@ body{
 
 /*  background-size: contain;*/
   background-attachment: fixed;
+  animation: animatedBackground 25s linear infinite;
+
   /*background-position: left;*/
   background-repeat: repeat-x;
   background-size: auto 250;
@@ -34,6 +41,9 @@ body{
   border-width: 0px 0px 2px 0px;
 
 }
+
+
+
  #title h1{
    display: inline-block;
    position: relative;
@@ -69,14 +79,14 @@ body{
     transition: 90ms;
 
  }
-/*
- #title a:hover{
+
+/* #title a:hover{
    background-color: #fff;
    color: #c0392b;
    border-radius: 2px;
- }
+ }*/
 
-*/
+
 #pages_container{
   position: relative;
   left: 15% ;
