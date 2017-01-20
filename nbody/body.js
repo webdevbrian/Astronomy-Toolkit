@@ -1,4 +1,4 @@
-function Body(mass, x, y, velocityX, velocityY, size, color){
+function Body(mass, x, y, velocityX, velocityY, density, color){
 	this.mass = mass;
 	this.x = x;
 	this.y = y;
@@ -7,10 +7,21 @@ function Body(mass, x, y, velocityX, velocityY, size, color){
 	this.trailVertices = [];
 	this.accelerationX = 0;
 	this.accelerationY = 0;
-	this.size = size;
+	this.density = density;
+	this.size = this.initialSize = this.getRadius(mass, density);
 	this.color = color;
 	this.mesh = this.createBodyMesh();
 	this.trail = this.createTrail();
+}
+
+Body.prototype.addTo = function(scene){
+	scene.add(this.mesh);
+	scene.add(this.trail);
+}
+
+Body.prototype.removeFrom = function(scene){
+	scene.remove(this.mesh);
+	scene.remove(this.trail);
 }
 
 Body.prototype.addPosition = function(){
@@ -25,6 +36,16 @@ Body.prototype.addPosition = function(){
 	}
 
 };
+
+Body.prototype.updateRadius = function(){
+	this.size = this.getRadius(this.mass, this.density);
+	var scale = this.size / this.initialSize;
+	this.mesh.scale.set(scale, scale, scale);
+}
+
+Body.prototype.getRadius = function(bodyMass, bodyDensity){
+	return Math.pow(bodyMass / bodyDensity, 1/3);
+}
 
 Body.prototype.update = function(step, trailLimit, scene){
 	this.velocityX += step * this.accelerationX;

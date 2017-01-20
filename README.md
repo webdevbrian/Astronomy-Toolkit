@@ -5,13 +5,13 @@
 
 ![Solar System Photo](http://i.imgur.com/fqtLaAk.png)
 
+![N-Body Simulator Photo](http://i.imgur.com/d6lsyGQ.png)
 ### Features
 * JavaScript skychart
 * THREE.js Solar System
 * N-Body Simulator
 
 ### Upcoming Features
-* N-Body Simulator
 * Eclipses Animations
 * Astronomical Clock
 * Daily Ephemerides

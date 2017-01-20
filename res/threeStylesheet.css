@@ -2,12 +2,10 @@ body{
   background-color: #000;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif	;
-
 }
 
 #error{
   display: none;
-
   z-index: 0;
   background-color: black;
   position: absolute;
@@ -17,7 +15,6 @@ body{
   width: 100%;
   -ms-transform: translate(-50%, -50%);
   transform    : translate(-50%, -50%);
-
 }
 
 #error a{
@@ -28,7 +25,6 @@ body{
   display: inline-block;
   width: 64px;
   margin-right: 50px;
-
 }
 
 canvas{
@@ -78,7 +74,6 @@ canvas{
   -webkit-transition: 0.3s linear;
   -moz-transition: 0.3s linear;
   -o-transition: 0.3s linear;
-
 }
 
 .blurBellow{
