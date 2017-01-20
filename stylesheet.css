@@ -15,8 +15,10 @@ body{
 
 @keyframes animatedBackground {
 	from { background-position: 0 0; }
-	to { background-position: 100% 0; }
+	to { background-position: 1170px 0; }
 }
+
+
 
 #title{
   position: relative;
@@ -25,16 +27,17 @@ body{
   background-image: url("./res/starry_night.jpg");
 
 /*  background-size: contain;*/
+  background-position: 0px 0px;
   background-attachment: fixed;
-  animation: animatedBackground 25s linear infinite;
+  animation: animatedBackground 35s linear infinite;
 
   /*background-position: left;*/
   background-repeat: repeat-x;
-  background-size: auto 250;
+  background-size: auto 250px;
   top: 0px;
   width: 100%;
   margin: 0px;
-  height: 20%;
+  height: auto;
   border-style: solid;
   text-align: center;
   border-color: #212121;
@@ -42,7 +45,12 @@ body{
 
 }
 
-
+#banner{
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6)); /* Standard syntax */
+}
 
  #title h1{
    display: inline-block;
@@ -55,6 +63,8 @@ body{
     1px -1px 0 #000,
     -1px 1px 0 #000,
      1px 1px 0 #000;
+   width: 100%;
+   height: 100%;
    /*left: 50px;*/
    /*float: left;*/
  }
