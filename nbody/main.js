@@ -1,11 +1,13 @@
 var scene, controls, renderer;
 
+var COLOR_OPTIONS = {format: 'hex'};
+
 var smoothingFactor = 0.001;
 var k = 0.05;
 var timePerStep = 0.01;
 var stepsPerFrame = 1;
-var bodyMass = 0.001;
-var bodyDensity = 90;
+var bodyMass = 0.1;
+var bodyDensity = 3000;
 var trailLength = 500;
 
 var canvasWidth, canvasHeight;
@@ -20,27 +22,12 @@ var fps;
 
 var paused = false;
 
-var sunPreset = [new Body(1.000, 0.0, 0.00, 0.00, 0.00, 900, 0xF0C400),]
+var sunPreset = [new Body(1.000, 0.0, 0.00, 0.00, 0.00, 900, 0xF0C400)]
 
-var solarSystemPreset = [
-  new Body(1.000, 0.0, 0.00, 0.00, 0.00, 900, 0xF0C400),
-  new Body(0.001, 0.0, 0.30, 0.35, 0.00, 90, 0x1d5cfe),
-  new Body(0.001, 0.0, 0.50, 0.28, 0.00, 90, 0x479d2d),
-  new Body(0.001, 0.0, 0.65, 0.25, 0.00, 90, 0xc32121),
-  new Body(0.001, 0.0, 0.80, 0.25, 0.00, 90, 0x188a79),
-]
-
-var binaryStarsPreset = [
-  new Body(1.0, 0.0, +0.3, +0.20, 0.00, 1500, 0xc32121),
-  new Body(1.0, 0.0, -0.3, -0.20, 0.00, 1500, 0xF0C400),
-
-]
-
-var bodies = [];//cloneBodies(solarSystemPreset);
+var bodies = [];
 
 window.onload = function(){
   initGUI();
-
   updateBodyNumber();
 
   try{
@@ -55,12 +42,7 @@ window.onload = function(){
   renderer.domElement.addEventListener("mouseup", getUpPosition, false);
   renderer.domElement.addEventListener("mousemove", getMovePosition, false);
 
-  //addProtoDisk();
   addSolarSystem();
-
-
-//  addMeshes();
-
   render();
 
 }
@@ -125,16 +107,15 @@ function checkCollisions(){
 		for(var j = 0; j < bodies.length; j++){
 			if(i != j && bodies[i].distanceToBody(bodies[j]) < bodies[i].size + bodies[j].size){
 				if(bodies[i].mass > bodies[j].mass){
-					bodies[i].mass += bodies[j].mass;
-          bodies[i].updateRadius();
+					bodies[i].collideWith(bodies[j]);
           bodies[j].removeFrom(scene);
 					bodies.splice(j, 1);
 				}
 				else{
-					bodies[j].mass += bodies[i].mass;
+          bodies[j].collideWith(bodies[i]);
           bodies[i].removeFrom(scene);
-          bodies[j].updateRadius();
 					bodies.splice(i, 1);
+          break;
 				}
         updateBodyNumber();
 			}
@@ -149,6 +130,7 @@ function getDownPosition(e){
 
 		beginX = endX = x;
 		beginY = endY = y;
+    console.log(beginX);
 
     beginVector = screenToWorldCoordinates(beginX, beginY);
     arrowMesh = new Arrow(beginVector, beginVector);
@@ -177,7 +159,7 @@ function getUpPosition(e){
 		var velX = 0.5 * (endVector.x - beginVector.x);
 		var velY = 0.5 * (endVector.y - beginVector.y);
     scene.remove(arrowMesh.mesh);
-		var body = new Body(bodyMass, beginVector.x, beginVector.y, velX, velY, bodyDensity, randomColor({format: 'hex'}));
+		var body = new Body(bodyMass, beginVector.x, beginVector.y, velX, velY, bodyDensity, randomColor(COLOR_OPTIONS));
     scene.add(body.mesh);
     scene.add(body.trail);
 		bodies.push(body);
@@ -230,21 +212,23 @@ function initGUI(){
   gui.add(this, 'showHelp').name("Help");
   var bodyFolder = gui.addFolder("Body Settings");
   bodyFolder.add(this, 'bodyMass', 0.001, 2).step(0.001).name("Mass");
-  bodyFolder.add(this, 'bodyDensity', 90, 1000).step(0.001).name("Density");
+  bodyFolder.add(this, 'bodyDensity', 90, 5000).step(0.001).name("Density");
   bodyFolder.open();
 
   var worldFolder = gui.addFolder("Simulation Settings");
   worldFolder.add(this, 'k', 0, 0.06).step(0.000001).name("G Constant");
   worldFolder.add(this, 'timePerStep', 0, 0.05).step(0.0001).name("Time Per Step");
   worldFolder.add(this, 'stepsPerFrame', 0, 10).step(1).name("Steps Per Frame").listen();
-  worldFolder.add(this, 'trailLength', 0, 1000).step(1).name("Trail Length");
+  worldFolder.add(this, 'trailLength', 0, 1000).step(1).name("Trail Length").listen();
   worldFolder.open();
 
   var presetFolder = gui.addFolder("Presets");
   presetFolder.add(this, 'clear').name("Empty Universe");
   presetFolder.add(this, 'addSun').name("A Single Star");
-  presetFolder.add(this, 'addSolarSystem').name("3 Planet Solar System");
-  presetFolder.add(this, 'addBinaryStars').name("Binary Stars");
+  presetFolder.add(this, 'addSolarSystem').name("Solar System");
+  presetFolder.add(this, 'addBinaryStars').name("Binary Star System");
+  presetFolder.add(this, 'addTripleStars').name("Triple Star System");
+  presetFolder.add(this, 'addMoonSystem').name("Planet w/ Satellite");
 	presetFolder.add(this, 'addProtoDisk').name("Protoplanetary Disk");
   presetFolder.open();
 }
@@ -277,12 +261,30 @@ function clear(){
   }
   bodies = [];
   updateBodyNumber();
+  controls.reset();
 }
+
+
 
 function addSolarSystem(){
   clear();
-  bodies = cloneBodies(solarSystemPreset);
-  addMeshes();
+  var sun = new Body(1.0, 0, 0, 0, 0, 1500, 0xF0C400);
+  bodies.push(sun);
+  sun.addTo(scene);
+  var x = Math.random() / 10;
+  var y = Math.random() / 10;
+
+	for(var i = 0; i < 4; i++){
+    x += Math.random() / 8 + 0.1;
+    y += Math.random() / 8 + 0.1;
+		var radius = Math.sqrt(x * x + y * y);
+		var speed = circularOrbitVelocity(sun.mass, radius);
+		var speedX = speed * y / radius;
+		var speedY = - speed * x / radius;
+		var planet = new Body(0.001, x, y, speedX, speedY, 90, randomColor(COLOR_OPTIONS));
+		bodies.push(planet);
+		planet.addTo(scene);
+	}
   updateBodyNumber();
 }
 
@@ -295,12 +297,58 @@ function addSun(){
 
 function addBinaryStars(){
   clear();
-  bodies = cloneBodies(binaryStarsPreset);
-  addMeshes();
+  var distance = 0.3 + Math.random() / 15;
+  var mass = Math.random() + 0.5;
+  var vel = circularOrbitVelocity(mass / 4.0, distance);
+  var star1 = new Body(mass, 0, +distance, -vel, 0, 1500, randomColor({format: 'hex', luminosity: 'dark'}));
+  var star2 = new Body(mass, 0, -distance, vel, 0, 1500, randomColor({format: 'hex', luminosity: 'light'}));
+  bodies.push(star1);
+  bodies.push(star2);
+  star1.addTo(scene);
+  star2.addTo(scene);
   updateBodyNumber();
-
 }
 
+function addTripleStars(){
+  clear();
+  var distance = 0.1 + Math.random() / 20;
+  var mass = Math.random() / 2 + 0.25;
+  var vel = Math.sqrt(0.25 * k * mass/ distance);
+  var star1 = new Body(mass, 0, +distance, -vel, 0, 1500, randomColor({format: 'hex', luminosity: 'dark'}));
+  var star2 = new Body(mass, 0, -distance, +vel, 0, 1500, randomColor({format: 'hex', luminosity: 'light'}));
+
+  var distance1 = 1.0 + Math.random() / 3;
+  var vel1 = circularOrbitVelocity(2 * mass, distance1);
+  var star3 = new Body(mass, 0, distance1, vel1, 0, 1500, randomColor(COLOR_OPTIONS));
+
+  bodies.push(star1);
+  bodies.push(star2);
+  bodies.push(star3);
+  star1.addTo(scene);
+  star2.addTo(scene);
+  star3.addTo(scene)
+  updateBodyNumber();
+}
+
+function addMoonSystem(){
+  clear();
+  var planetDistance = 0.45 + Math.random() / 3;
+  var sunMass = 0.7 + Math.random() / 2;
+  var planetMass = 0.01 + Math.random() / 100;
+  var satDistance = 0.05;
+  var planetVel = circularOrbitVelocity(sunMass, planetDistance);
+  var satVel = circularOrbitVelocity(planetMass, satDistance);
+
+  var sun = new Body(sunMass, 0, 0, 0, 0, 1500, 0xF0C400);
+  var planet = new Body(planetMass, 0, planetDistance, planetVel, 0, 2000, randomColor({format: 'hex', luminosity: 'dark'}));
+  var sat = new Body(0.0001, 0, planetDistance + satDistance, satVel + planetVel, 0, 90, randomColor({format: 'hex', luminosity: 'light'}));
+
+  bodies.push(sun, planet, sat);
+  sun.addTo(scene);
+  planet.addTo(scene);
+  sat.addTo(scene);
+  updateBodyNumber();
+}
 
 function addProtoDisk(){
 	clear();
@@ -308,19 +356,24 @@ function addProtoDisk(){
 	var sun = new Body(sunMass, 0, 0, 0, 0, 1500, 0xF0C400);
   bodies.push(sun);
   sun.addTo(scene);
-	var particleMass = 0.00005;
-	for(var i = 0; i < 250; i++){
+	var particleMass = 0.00007;
+	for(var i = 0; i < 200; i++){
     var x = 1 - 2 * Math.random() + 0.1;
 		var y = 1 - 2 * Math.random() + 0.1;
 		var radius = Math.sqrt(x * x + y * y);
-		var speed = Math.sqrt(k * sunMass / radius);
+		var speed = circularOrbitVelocity(sunMass, radius);
 		var speedX = speed * y / radius;
 		var speedY = - speed * x / radius;
-		var particle = new Body(particleMass, x, y, speedX, speedY, 100, randomColor({format: 'hex'}));
+		var particle = new Body(particleMass, x, y, speedX, speedY, 500, randomColor(COLOR_OPTIONS));
 		bodies.push(particle);
 		particle.addTo(scene);
 	}
   updateBodyNumber();
+  trailLength = 0;
+}
+
+function circularOrbitVelocity(mass, distance){
+  return Math.sqrt(k * mass / distance);
 }
 
 function updateBodyNumber(){

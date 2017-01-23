@@ -1,3 +1,5 @@
+var MAX_POINTS = 1000;
+
 function Body(mass, x, y, velocityX, velocityY, density, color){
 	this.mass = mass;
 	this.x = x;
@@ -12,6 +14,8 @@ function Body(mass, x, y, velocityX, velocityY, density, color){
 	this.color = color;
 	this.mesh = this.createBodyMesh();
 	this.trail = this.createTrail();
+
+	this.index = 0;
 }
 
 Body.prototype.addTo = function(scene){
@@ -56,15 +60,36 @@ Body.prototype.update = function(step, trailLimit, scene){
 
 	this.mesh.position.set(this.x, this.y, 0);
 
-	this.trailVertices.push(new THREE.Vector3(this.x, this.y, -0.0001));
-	while(this.trailVertices.length > trailLimit){
-		this.trailVertices.shift();
-	}
-	scene.remove(this.trail);
-	this.trail = this.createTrail();
-	scene.add(this.trail);
+	this.updateTrail(this.x, this.y, -0.01, trailLimit);
 }
 
+Body.prototype.updateTrail = function(x, y, z, limit){
+	var positions = this.trail.geometry.attributes.position.array;
+
+	var diff = this.index / 3.0 - limit;
+	if(diff >= 0){
+		for(var i = 0; i < limit * 3 - 3; i++){
+			positions[i] = positions[i + 3 * (diff + 1)];
+		}
+		this.index = limit * 3 - 3;
+	}
+
+	positions[this.index++] = x;
+	positions[this.index++] = y;
+	positions[this.index++] = z;
+	this.trail.geometry.setDrawRange(0, this.index / 3.0);
+	this.trail.geometry.attributes.position.needsUpdate = true;
+	this.trail.geometry.computeBoundingSphere();
+
+}
+
+Body.prototype.collideWith = function(anotherBody){
+	var totalMass = this.mass + anotherBody.mass;
+	this.velocityX = (this.mass * this.velocityX + anotherBody.mass * anotherBody.velocityX) / totalMass;
+	this.velocityY = (this.mass * this.velocityY + anotherBody.mass * anotherBody.velocityY) / totalMass;
+	this.mass = totalMass;
+	this.updateRadius();
+}
 
 Body.prototype.resetAcceleration = function(){
 	this.accelerationY = 0;
@@ -99,7 +124,11 @@ Body.prototype.createBodyMesh = function(){
 
 Body.prototype.createTrail = function(){
 	var material = new THREE.LineBasicMaterial({color: this.color});
-	var geometry = new THREE.Geometry();
+	var geometry = new THREE.BufferGeometry;
+	this.trailVertices = new Float32Array(MAX_POINTS * 3);3
+	geometry.addAttribute('position', new THREE.BufferAttribute(this.trailVertices, 3));
 	geometry.vertices = this.trailVertices;
-	return new THREE.Line( geometry, material );
+	var mesh = new THREE.Line( geometry, material );
+	//mesh.frustumCulled = false;
+	return mesh;
 }
