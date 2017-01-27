@@ -256,8 +256,8 @@ function closeHelp(){
 
 function clear(){
   for(var i = 0; i < bodies.length; i++){
-    scene.remove(bodies[i].mesh);
-    scene.remove(bodies[i].trail);
+    bodies[i].removeFrom(scene);
+    bodies[i].dispose();
   }
   bodies = [];
   updateBodyNumber();

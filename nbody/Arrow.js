@@ -1,5 +1,6 @@
 var arrowHeadLength = 0.09;
 var arrowHeadAngle = Math.PI / 2.7;
+
 function Arrow(startVector, endVector){
   var lineMaterial = new THREE.LineBasicMaterial({color: 0xffffff});
   var lineGeom = new THREE.Geometry();

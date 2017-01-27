@@ -18,6 +18,15 @@ function Body(mass, x, y, velocityX, velocityY, density, color){
 	this.index = 0;
 }
 
+Body.prototype.dispose = function(){
+	this.mesh.material.dispose();
+	this.mesh.geometry.dispose();
+	this.trail.material.dispose();
+	this.trail.geometry.dispose();
+	delete(this.mesh);
+	delete(this.trail);
+}
+
 Body.prototype.addTo = function(scene){
 	scene.add(this.mesh);
 	scene.add(this.trail);
