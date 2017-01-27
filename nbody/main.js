@@ -109,12 +109,16 @@ function checkCollisions(){
 				if(bodies[i].mass > bodies[j].mass){
 					bodies[i].collideWith(bodies[j]);
           bodies[j].removeFrom(scene);
+          bodies[j].dispose();
 					bodies.splice(j, 1);
+          j--;
 				}
 				else{
           bodies[j].collideWith(bodies[i]);
           bodies[i].removeFrom(scene);
+          bodies[i].dispose();
 					bodies.splice(i, 1);
+          i--;
           break;
 				}
         updateBodyNumber();
@@ -130,7 +134,6 @@ function getDownPosition(e){
 
 		beginX = endX = x;
 		beginY = endY = y;
-    console.log(beginX);
 
     beginVector = screenToWorldCoordinates(beginX, beginY);
     arrowMesh = new Arrow(beginVector, beginVector);
